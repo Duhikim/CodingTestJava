@@ -1,6 +1,5 @@
 package CodingTestStudy.NewsClustering;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 class Solution {

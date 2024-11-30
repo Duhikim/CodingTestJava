@@ -1,4 +1,4 @@
-package PrivateInfor;
+package CodingTestStudy.PrivateInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;

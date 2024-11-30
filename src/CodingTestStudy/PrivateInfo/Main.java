@@ -1,4 +1,4 @@
-package PrivateInfor;
+package CodingTestStudy.PrivateInfo;
 
 public class Main {
 
