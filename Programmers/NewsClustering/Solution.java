@@ -71,7 +71,7 @@ class Solution {
 
     public static HashMap<String, Integer> makeMap(String str) {
         str = str.toUpperCase(); // 문자열 정리부터 한다. 대소문자 구분 안 하므로 대문자로 일괄 전환 후 대문자 제외하고 필터링.
-        // str = str.replaceAll("[^A-Z]", ""); // 문제를 잘못이해한듯. AB+CD가 있으면 AB BC CD가 아니라 AB CD 이렇게 들어가야 하나 보다.
+        // str = str.replaceAll("[^A-Z]", ""); // 문제를 잘못이해한듯. "AB+CD"가 있으면 AB BC CD가 아니라 AB CD 이렇게 들어가야 하나 보다.
 
         HashMap<String, Integer> letterMap = new HashMap<>();
         // str의 인덱스 0부터 마지막 전 글자까지 두 글자씩 묶어서 Map에 넣고 value는 1로 함.
