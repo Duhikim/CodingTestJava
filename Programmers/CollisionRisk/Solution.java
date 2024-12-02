@@ -42,6 +42,63 @@ public class Solution {
             System.out.println("Incorrect : " + expected +" , "+calculated);
         }
 
+        points = new int[][]{{1,1}, {10,10}};
+        routes = new int[][]{{1,2}, {1,2}};
+        expected = 19;
+        calculated = sol.solution(points, routes);
+        if(expected==calculated){
+            System.out.println("Correct : " + calculated);
+        }
+        else{
+            System.out.println("Incorrect : " + expected +" , "+calculated);
+        }
+
+        points = new int[][]{{1,1}, {10,10}, {1, 10}};
+        routes = new int[][]{{1,2}, {1,3}};
+        expected = 1;
+        calculated = sol.solution(points, routes);
+        if(expected==calculated){
+            System.out.println("Correct : " + calculated);
+        }
+        else{
+            System.out.println("Incorrect : " + expected +" , "+calculated);
+        }
+
+        points = new int[][]{{1,1}, {2,2}, {3, 3}};
+        routes = new int[][]{{1,2, 1}, {3,2, 1}};
+        expected = 3;
+        calculated = sol.solution(points, routes);
+        if(expected==calculated){
+            System.out.println("Correct : " + calculated);
+        }
+        else{
+            System.out.println("Incorrect : " + expected +" , "+calculated);
+        }
+
+        points = new int[][]{{1,1}, {1,2}, {1, 3}};
+        routes = new int[][]{{2, 1}, {2, 3}};
+        expected = 1;
+        calculated = sol.solution(points, routes);
+        if(expected==calculated){
+            System.out.println("Correct : " + calculated);
+        }
+        else{
+            System.out.println("Incorrect : " + expected +" , "+calculated);
+        }
+        //int[][] points = {{1, 1}, {3, 3}, {6, 6}, {10, 10}};
+        //int[][] routes = {{1, 2, 3, 4}, {1, 4, 3, 2}};
+        //예상 출력: 2
+        //실제 출력: 8
+        points = new int[][]{{1, 1}, {3, 3}, {6, 6}, {10, 10}};
+        routes = new int[][]{{1, 2, 3, 4}, {1, 4, 3, 2}};
+        expected = 2;
+        calculated = sol.solution(points, routes);
+        if(expected==calculated){
+            System.out.println("Correct : " + calculated);
+        }
+        else{
+            System.out.println("Incorrect : " + expected +" , "+calculated);
+        }
 
 
     }
@@ -63,23 +120,26 @@ public class Solution {
         int answer = 0;
 
         ArrayList<Robot> robots = new ArrayList<Robot>();
-        // routes를 차례대로 읽으면서 첫번째 번호가 의미하는 포인트의 r좌표와 c좌표를 읽어서 robot을 생성한다.
-        // 생성 후 routes의 두번째 번호가 의미하는 포인트의 r좌표와 c좌표를 robot의 목적지로 설정한다.
-        // 그 후 robot을 robots 배열에 넣고 로봇 수를 센다.
-        for (int i = 0; i< routes.length; i++) {
-            Robot robot = new Robot(points[routes[i][0] - 1][0], points[routes[i][0] - 1][1]);
-            robot.setTarget(points[routes[i][1]-1][0], points[routes[i][1]-1][1]);
+        int numOfRobots = routes.length;
+        Robot.satisfy=0;
+
+        for (int[] route : routes) {
+            Robot robot = new Robot(); // (0, 0)에 robot 생성
+            robot.setTargets(points, route); // routes에 담겨있는 포인터들의 좌표를 points에서 읽어서 목표 좌표를 배열로 입력한다.
+            robot.setNextTarget(); // 다음 목표를 설정하는 함수. 여기서는 첫번째 목표점이 입력된다. (사실상 시작점)
+
             robots.add(robot);
-            Robot.numOfRobots++;
         }
+
         // 로봇 만족 카운터가 로봇 개수와 같아질 때 까지 반복.
-        while(Robot.satisfy < Robot.numOfRobots) {
-
-            answer += collisionCheck(robots);
-
+        while(Robot.satisfy < numOfRobots) {
+            // 일단 한칸 움직이자. ( (0, 0)이고 fin이 false인 경우 즉 가장 처음에는 목표점으로 바로 이동 )
             for (Robot robot : robots) {
-                robot.moveOnce();
-            } // move로 r, c 좌표가 목적지에 도달한 경우, 아직 fin은 true가 되지 않는다. 다음 사이클에서 true가 됨.
+                if(robot.moveOnce()) { // 움직인 후 목표지점에 도착하면 다음 목표를 설정한다.
+                    robot.setNextTarget();
+                }
+            }
+            answer += collisionCheck(robots); // 충돌 체크
         }
 
         return answer;
@@ -89,17 +149,19 @@ public class Solution {
         int collision = 0;
 
         // 현재 robot의 위치들을 Map에 추가하여 같은 위치에 두 대 이상 존재하는 경우 충돌 상황으로 봄.
-        HashMap<List<Integer>, Integer> coordMap = new HashMap<>();
+        HashMap<String, Integer> coordMap = new HashMap<>();
         for (Robot robot : robots) {
-                List<Integer> key = Arrays.asList(robot.getR(), robot.getC());
-                coordMap.put(key, coordMap.getOrDefault(key, 0) + 1);
+            String key = robot.getR() + ","+robot.getC();
+            //List<Integer> key = Arrays.asList(robot.getR(), robot.getC()); // 틀리는 원인이 List인가 싶어서 좌표를 String 형식으로 바꿨다.
+            coordMap.put(key, coordMap.getOrDefault(key, 0) + 1);
         }
-        for(Map.Entry<List<Integer>, Integer> entry : coordMap.entrySet()) {
+
+        for(Map.Entry<String, Integer> entry : coordMap.entrySet()) {
             // value값이 2 이상이면 2든 3이든 몇이든 1회 충돌.
             // 같은 시점이어도 여러군데에서 충돌이 발생하는 경우 전부 더해줘야 함.
             // 목적지에 도착하면 escape zone인 (0, 0)으로 이동하는데 이 경우는 제외해줘야 한다.
-            if(entry.getValue() > 1) {
-                if (entry.getKey().equals(Robot.escape)) continue;
+            if(entry.getValue() > 1 &&
+                    !(entry.getKey().equals("0,0"))) {
                 collision++;
             }
         }
@@ -108,26 +170,41 @@ public class Solution {
 
 
     public static class Robot{
-        public static int satisfy = 0; // 조건 만족 카운터
-        public static int numOfRobots; // 로봇 개수. 즉 조건 만족 카운터의 타겟 숫자.
-        public static List<Integer> escape = Arrays.asList(0, 0); // 탈출 좌표.
+        public static int satisfy; // 조건 만족 카운터
 
         private int r; // 현재의 r 좌표. 초기 값은 포인트 정보로 주어진다.
         private int c; // 현재의 c 좌표. 초기 값은 포인트 정보로 주어진다.
-        private int targetIndex = 0;
-        private int[] re; // 목표 r좌표
-        private int[] ce; // 목표 c좌표
+        private int re; // 목표 r좌표
+        private int ce; // 목표 c좌표
+        private int targetIndex;
+        private ArrayList<Integer> rTargets;
+        private ArrayList<Integer> cTargets;
         private boolean fin;
 
-        public Robot(int r, int c) {
-            this.r = r;
-            this.c = c;
+        public Robot() {
+            this.r = 0;
+            this.c = 0;
+            this.re = 0;
+            this.ce = 0;
+            this.targetIndex = 0;
+            this.rTargets = new ArrayList<>();
+            this.cTargets = new ArrayList<>();
             this.fin = false;
         }
-        public void setTarget(int re, int ce){
-            this.re[targetIndex] = re;
-            this.ce[targetIndex] = ce;
+        public void setNextTarget(){
+            if(targetIndex == rTargets.size()) {
+                fin = true; // fin이 true로 바뀐 시점에선 아직 escape zone으로 탈출하지 않음. 마지막 타겟 포인트에 위치.
+                return;
+            }
+            this.re = rTargets.get(targetIndex);
+            this.ce = cTargets.get(targetIndex);
             targetIndex++;
+        }
+        public void setTargets(int[][] points, int[] route){
+            for (int ptIdx : route) {
+                this.rTargets.add(points[ptIdx - 1][0]);
+                this.cTargets.add(points[ptIdx - 1][1]);
+            }
         }
         public int getR(){
             return r;
@@ -135,16 +212,24 @@ public class Solution {
         public int getC(){
             return c;
         }
-        public void moveOnce(){
-            if(fin) return; // 도착했으면 처리 안하겠음.
 
-            if(r !=re) { r = (r <re)? r +1: r -1; }
-            else if(c !=ce) { c = (c <ce)? c +1: c -1; }
-            else {
-                r =0; c =0; // 도착하면 좌표를 0, 0으로 보내고
-                fin = true; // fin을 true로 바꾸고
+        public boolean moveOnce(){ // 한칸 움직인 후 목표에 도달하면 true, 아니면 false를 반환.
+            if(fin){ // 마지막 move. 최종 타겟 포인트에서 한 번 더움직여서 escape zone (0, 0) 으로 탈출함.
+                this.r = 0;
+                this.c = 0;
                 satisfy++; // 조건 만족 카운터를 하나 올려준다.
+                return false; // 도착했으면 처리 안하겠음.
             }
+            if(r==0 && c==0) {
+                r = re;
+                c = ce;
+            }
+            if (r != re) {
+                r += (r < re) ? 1 : -1;
+            } else if (c != ce) {
+                c += (c < ce) ? 1 : -1;
+            }
+            return (r==re && c==ce);
         }
     }
 }
