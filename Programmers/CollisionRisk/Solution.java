@@ -91,7 +91,7 @@ public class Solution {
         //실제 출력: 8
         points = new int[][]{{1, 1}, {3, 3}, {6, 6}, {10, 10}};
         routes = new int[][]{{1, 2, 3, 4}, {1, 4, 3, 2}};
-        expected = 2;
+        expected = 8;
         calculated = sol.solution(points, routes);
         if(expected==calculated){
             System.out.println("Correct : " + calculated);
@@ -215,9 +215,11 @@ public class Solution {
 
         public boolean moveOnce(){ // 한칸 움직인 후 목표에 도달하면 true, 아니면 false를 반환.
             if(fin){ // 마지막 move. 최종 타겟 포인트에서 한 번 더움직여서 escape zone (0, 0) 으로 탈출함.
-                this.r = 0;
-                this.c = 0;
-                satisfy++; // 조건 만족 카운터를 하나 올려준다.
+                if(r != 0 && c != 0) {
+                    this.r = 0;
+                    this.c = 0;
+                    satisfy++; // 조건 만족 카운터를 하나 올려준다.
+                }
                 return false; // 도착했으면 처리 안하겠음.
             }
             if(r==0 && c==0) {
