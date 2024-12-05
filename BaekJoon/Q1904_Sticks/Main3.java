@@ -1,23 +1,26 @@
 package CodingTestStudy.Sticks;
 
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class Main2 {
 
-    public static void main(String[] args) {
-        int X;
-        Scanner scanner = new Scanner(System.in);
-        X = scanner.nextInt();
-        int Num = 64;
+public class Main3 {
+
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int X = Integer.parseInt(br.readLine());
+
         int answer = 1;
-        while(true) {
-            while (Num > X) { Num = Num >> 1;}
-            X -= Num;
-            if(X==0) break;
-            answer++;
+        int[] arr = {64, 32, 16, 8, 4, 2, 1};
+        int num=0;
+        for(int bin: arr){
+            if(num+bin == X) { System.out.println(answer); return; }
+            if(num+bin < X){
+                num += bin;
+                answer++;
+            }
         }
-
         System.out.println(answer);
     }
 }

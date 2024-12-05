@@ -1,18 +1,18 @@
 package CodingTestStudy.Sticks;
 
-import java.util.LinkedList;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main2 {
 
-    public static void main(String[] args) {
-        int X;
-        Scanner scanner = new Scanner(System.in);
-        X = scanner.nextInt();
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int X = Integer.parseInt(br.readLine());
         int Num = 64;
         int answer = 1;
         while(true) {
-            while (Num > X) { Num /= 2;}
+            while (Num > X) { Num = Num >> 1;}
             X -= Num;
             if(X==0) break;
             answer++;
