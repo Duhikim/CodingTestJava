@@ -1,6 +1,8 @@
 package CodingTestStudy.CollisionRisk;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Solution {
     public static void main(String[] args) {
@@ -215,22 +217,19 @@ public class Solution {
 
         public boolean moveOnce(){ // 한칸 움직인 후 목표에 도달하면 true, 아니면 false를 반환.
             if(fin){ // 마지막 move. 최종 타겟 포인트에서 한 번 더움직여서 escape zone (0, 0) 으로 탈출함.
-                if(r != 0 && c != 0) {
+                if(r != 0 && c != 0) { // 이 조건이 안 들어가면 escape zone에 도착한 로봇들이 계속 satisfy 카운터를 올리게 된다.
                     this.r = 0;
                     this.c = 0;
                     satisfy++; // 조건 만족 카운터를 하나 올려준다.
                 }
                 return false; // 도착했으면 처리 안하겠음.
             }
-            if(r==0 && c==0) {
+            if(r==0 && c==0) { // 첫 목표때만 실행
                 r = re;
                 c = ce;
             }
-            if (r != re) {
-                r += (r < re) ? 1 : -1;
-            } else if (c != ce) {
-                c += (c < ce) ? 1 : -1;
-            }
+            if (r != re) { r += (re - r) / Math.abs(re - r); }
+            else if (c != ce) { c += (ce - c) / Math.abs(ce - c);}
             return (r==re && c==ce);
         }
     }
