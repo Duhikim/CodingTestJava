@@ -1,8 +1,6 @@
 package CodingTestStudy.TableEdit;
 
-
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.ArrayDeque;
 
 class Solution_ver2 {
     public static void main(String[] args) {
@@ -37,50 +35,39 @@ class Solution_ver2 {
          ************/
         StringBuilder answer = new StringBuilder(n);
 
-
-        LinkedList<Integer> dataList = new LinkedList<>();
-        LinkedList<Integer> deletedData = new LinkedList<>();
-        for(int i=0; i<n; i++){
-            dataList.add(i);
-        }
-//        ListIterator<Integer> iter = dataList.listIterator(k);
+        boolean[] deleted = new boolean[n];
+        ArrayDeque<Integer> deletedData = new ArrayDeque<>();
+        int max = n-1;
 
         for(String command: cmd){
             switch(command.charAt(0)){
                 case 'U':
                     String[] str1 = command.split(" ");
-                    k -= (Integer.parseInt(str1[1]));
+                    int up = (Integer.parseInt(str1[1]));
+                    while(up > 0 ) { if(!deleted[--k]) up--; }
                     break;
                 case 'D':
                     String[] str2 = command.split(" ");
-                    k += (Integer.parseInt(str2[1]));
+                    int down = (Integer.parseInt(str2[1]));
+                    while(down > 0 ) { if(!deleted[++k]) down--; }
                     break;
                 case 'C':
-                    deletedData.add(0, dataList.get(k));
-                    dataList.remove(k);
-                    if(k==dataList.size()) k--;
+                    deletedData.addLast(k);
+                    deleted[k] = true;
+                    int temp = k;
+                    boolean hasNext = k < max; // max는 최대값
+                    while(hasNext && deleted[++k]){}
+                    while(!hasNext && deleted[--k]){};
+                    if(!hasNext) max = k;
                     break;
                 case 'Z':
-                    int temp = deletedData.get(0);
-                    if(temp < dataList.get(k)) k++;
-                    deletedData.remove(0);
-                    ///
-                    ListIterator<Integer> iterator = dataList.listIterator();
-                    while (iterator.hasNext()) {
-                        if (iterator.next() > temp) {
-                            // 이전 위치로 되돌린 후 삽입
-                            iterator.previous();
-                            iterator.add(temp);
-                            break;
-                        }
-                    }
-                    if (!iterator.hasNext()) {
-                        dataList.add(temp);
-                    }
+                    int restore = deletedData.pollLast();
+                    deleted[restore] = false;
+                    if(restore > max) max = restore;
                     break;
             }
         }
-        answer.append("O".repeat(Math.max(0, n)));
+        answer.append("O".repeat(n));
         for(int num: deletedData){
             answer.setCharAt(num, 'X');
         }
