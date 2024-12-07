@@ -1,15 +1,17 @@
-//ver2
 package CodingTestStudy.CounselorNumber;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
-class Solution_ver2 {
+class Solution {
     public static void main(String[] args) {
         int k=0;
         int n=0;
         int[][] reqs;
         int expected, calculated;
-        Solution_ver2 sol = new Solution_ver2();
+        Solution sol = new Solution();
 
         k=3;
         n=5;
@@ -86,44 +88,77 @@ class Solution_ver2 {
         }
     }
 
-    public void handleRequest(int[][] reqs, int[] mentor_original, int[] answer) {
-        // 상담 중인 건을 HashMap 타입으로 저장한다.
-        // 질문 유형을 Key, 상담이 끝나는 시간을 Value로 저장. 해당 유형의 상담이 여러개인 경우 Array를 사용하든 String으로 저장해서 콤마(,)로 구분하든 한다.
-        // 상담 요청이 들어 왔을 때, 남은 상담원이 있을때는 상담원-- 후 Map에 추가.
-        // 상담원이 없는 경우, Key값으로 Map에 접근. 상담이 가장 일찍 끝나는 시간과(A라고함) 비교한다.
-        // 만약, 현재 시간이 A보다 클 경우, A시간은 지워버리고 현재 요청한 사람은 대기없이 바로 상담을 할 수 있다.
-        // 만약, 현재 시간이 A보다 작은 경우, A-현재시간 이라는 대기시간이 발생한다. A시간은 지워버리고 현재 요청한 사람이 대기 이후 상담이 끝나는 시간을 저장.
+    public void handleRequest(int[][] reqs, int[] mentor, int[] answer) {
+        //상담을 시작하면 HashMap을 만들어서 (끝나는 시간, 상담 유형)을 저장한다.
+        //끝나는 시간이 겹칠수도 있다. 상담 유형을 정수가 아닌 String으로 저장한다.
+        //예를들어 50분에 1번유형이 끝난다면 (50, "1")인데, 만약 같은시간에 4번유형도 끝나면 (50,"14")로 저장.
+        //나중에 하나씩 갈라쓰면 됨. 5개밖에 안되므로 상관없음.
+        //아 자동정렬되게 TreeMap으로 하자.
 
-        HashMap<Integer, TreeMap<Integer, Integer>> mentoring = new HashMap<>(); // Key: 유형, Value: 상담이 끝나는 시간의 배열.
-        int[] mentor = mentor_original.clone();
+        int[] mentor_copy = mentor.clone();
+        int waitTime = 0;
+        TreeMap<Integer, String> mentoring = new TreeMap<>();
 
-        TreeMap<Integer, Integer>[] endTimeQue = new TreeMap[6]; // 트리맵의 어레이. 각 유형별 트리맵을 의미한다.
-        for(int i=0; i<6; i++){
-            endTimeQue[i] = new TreeMap<>(); // 유형별(1~5)로 빈 TreeMap을 넣어줌. Key: 상담이 끝나는 시간, Value: 그 시간에 끝나는 상담의 개수. (기본은 1)
-        }
-
-        for(int[] req:reqs){ // 각 요청문을 돌면서 처리.
-            int startTime = req[0]; //시작 시간
-            int period = req[1]; // 걸리는 시간
-            int type = req[2]; // 유형
-            if(mentor[type]>0){ // 만약 필요한 멘토가 있다면
-                mentor[type]--; // 멘토수를 줄이고
-                int endTime = startTime + period; // 상담이 끝나는 시간을 구하기
-                endTimeQue[type].put(endTime, endTimeQue[type].getOrDefault(endTime, 0)+1); // 상담이 끝나는 시간을 트리맵에 추가.
-            }
-            else{ // 액면 멘토가 없다면
-                Map.Entry<Integer, Integer> entry = endTimeQue[type].firstEntry(); // 제일 처음으로 끝나는 상담 건을 확인.
-                    // 1. getValue값을 하나 낮춰준다. (0이면 삭제할 예정)
-                    // 2. 기다려야 하는 시간을 구한다. 만약 시작 시간이 첫번쨰 상담 끝나는 시간보다 크거나 같으면 대기시간은 0이다.
-                    // 3. 새로운 endTime을 endTimeQue에 추가한다. endTime은 startTime+waitingTime+period.
-                    endTimeQue[type].put(entry.getKey(), entry.getValue()-1); // 1. getValue값을 하나 낮춰준다.
-                    if(entry.getValue() == 0){ endTimeQue[type].pollFirstEntry();} // 1. Value값이 0이면 제거.
-                    int waitingTime = entry.getKey() - startTime; // 2. 기다려야 하는 시간을 구하기
-                    if(waitingTime<0) waitingTime = 0; // 2. 만약 시작 시간이 첫번쨰 상담 끝나는 시간보다 크거나 같은 경우, 대기시간은 0이다.
-                    int endTime = startTime + waitingTime + period; // 3. 새로운 endTime을 구하기
-                    endTimeQue[type].put(endTime, endTimeQue[type].getOrDefault(endTime, 0)+1); // 3. 새로운 endTime을 endTimeQue에 추가.
+        for(int[] req:reqs){
+            // 상담 시작 전에 끝난 상담부터 처리하고 그 다음에 상담 시작 처리하면 꼬이지 않을 듯 함.
+            int currentTime = req[0];
+                //현재 시간보다 Key 값이 작은 것들은 다 빼낸다.
+                while(!mentoring.isEmpty() && mentoring.firstKey() <= currentTime){
+                    String str = mentoring.pollFirstEntry().getValue();
+                    int len = str.length();
+                    if(len == 1){
+                        int type=Integer.parseInt(str);
+                        mentor_copy[type]++;
+                    }
+                    else{
+                        for(int i=0; i<len; i++){
+                            int type = str.charAt(i) - '0';
+                            mentor_copy[type]++;
+                        }
+                    }
                 }
+                // 완료.
+
+            if(mentor_copy[req[2]] > 0){
+                // 멘토가 있으므로 상담 처리.
+                mentor_copy[req[2]]--;
+                // mentor 배열 수정해주고 mentoring 맵에 끝나는 시간 추가함.
+                int finTime = req[0]+req[1];
+                mentoring.put(finTime, mentoring.getOrDefault(finTime, "") + req[2]);
+                // 완료
             }
+            else {
+                // 멘토가 없으므로 기다려야 함.
+                // 여기서 기다리는 시간 올라가고 매 사이클 answer[0]와 비교할 예정.
+                // 기다리는 시간만 계산하고나서 바로 mentoring에 집어넣어도 문제 없을듯?
+                // 이경우 멘토 수가 음수로 가지만 어차피 나오자마자 다시 들어가니 문제 없음.
+                int waiting = - mentor_copy[req[2]];
+
+                for(Map.Entry<Integer, String> entry: mentoring.entrySet()){
+                    String str = entry.getValue();
+                    int len = str.length();
+                    boolean found = false;
+                    for(int i=0; i<len; i++){
+                        if((int)(str.charAt(i)-'0')==req[2]){
+                            if (waiting > 0) {
+                                waiting--;
+                                continue;
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(found) {
+                        waitTime += entry.getKey() - currentTime; // 상담시작시간 - 현재 시간
+                        int finTime = entry.getKey() + req[1];
+                        mentoring.put(finTime, mentoring.getOrDefault(finTime, "") + req[2]);
+                        mentor_copy[req[2]]--;
+                        if (waitTime > answer[0] && answer[0] != 0) return; // 조기에 조건에 안맞으면 함수 자체를 탈출
+                        break; // 상담 예약 됐으니 더 탐색 불필요.
+                    }
+                }
+            } // 완료
         }
+        if(answer[0]==0 || answer[0] > waitTime) answer[0] = waitTime;
     }
 }
