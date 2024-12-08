@@ -1,17 +1,15 @@
 package CodingTestStudy.CounselorNumber;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-class Solution {
+class Solution_ver1 {
     public static void main(String[] args) {
         int k=0;
         int n=0;
         int[][] reqs;
         int expected, calculated;
-        Solution sol = new Solution();
+        Solution_ver1 sol = new Solution_ver1();
 
         k=3;
         n=5;

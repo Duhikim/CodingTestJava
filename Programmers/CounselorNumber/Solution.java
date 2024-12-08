@@ -3,13 +3,13 @@ package CodingTestStudy.CounselorNumber;
 
 import java.util.*;
 
-class Solution_ver2 {
+class Solution {
     public static void main(String[] args) {
         int k=0;
         int n=0;
         int[][] reqs;
         int expected, calculated;
-        Solution_ver2 sol = new Solution_ver2();
+        Solution sol = new Solution();
 
         k=3;
         n=5;
@@ -93,6 +93,7 @@ class Solution_ver2 {
         // 상담원이 없는 경우, Key값으로 Map에 접근. 상담이 가장 일찍 끝나는 시간과(A라고함) 비교한다.
         // 만약, 현재 시간이 A보다 클 경우, A시간은 지워버리고 현재 요청한 사람은 대기없이 바로 상담을 할 수 있다.
         // 만약, 현재 시간이 A보다 작은 경우, A-현재시간 이라는 대기시간이 발생한다. A시간은 지워버리고 현재 요청한 사람이 대기 이후 상담이 끝나는 시간을 저장.
+        int answerCandidate = 0;
 
         HashMap<Integer, TreeMap<Integer, Integer>> mentoring = new HashMap<>(); // Key: 유형, Value: 상담이 끝나는 시간의 배열.
         int[] mentor = mentor_original.clone();
@@ -108,22 +109,23 @@ class Solution_ver2 {
             int type = req[2]; // 유형
             if(mentor[type]>0){ // 만약 필요한 멘토가 있다면
                 mentor[type]--; // 멘토수를 줄이고
-                int endTime = startTime + period; // 상담이 끝나는 시간을 구하기
+                int endTime = startTime + period; // 상담이 끝나는 시간 구하기
                 endTimeQue[type].put(endTime, endTimeQue[type].getOrDefault(endTime, 0)+1); // 상담이 끝나는 시간을 트리맵에 추가.
             }
             else{ // 액면 멘토가 없다면
                 Map.Entry<Integer, Integer> entry = endTimeQue[type].firstEntry(); // 제일 처음으로 끝나는 상담 건을 확인.
-                    // 1. getValue값을 하나 낮춰준다. (0이면 삭제할 예정)
-                    // 2. 기다려야 하는 시간을 구한다. 만약 시작 시간이 첫번쨰 상담 끝나는 시간보다 크거나 같으면 대기시간은 0이다.
-                    // 3. 새로운 endTime을 endTimeQue에 추가한다. endTime은 startTime+waitingTime+period.
-                    endTimeQue[type].put(entry.getKey(), entry.getValue()-1); // 1. getValue값을 하나 낮춰준다.
-                    if(entry.getValue() == 0){ endTimeQue[type].pollFirstEntry();} // 1. Value값이 0이면 제거.
-                    int waitingTime = entry.getKey() - startTime; // 2. 기다려야 하는 시간을 구하기
-                    if(waitingTime<0) waitingTime = 0; // 2. 만약 시작 시간이 첫번쨰 상담 끝나는 시간보다 크거나 같은 경우, 대기시간은 0이다.
-                    int endTime = startTime + waitingTime + period; // 3. 새로운 endTime을 구하기
-                    endTimeQue[type].put(endTime, endTimeQue[type].getOrDefault(endTime, 0)+1); // 3. 새로운 endTime을 endTimeQue에 추가.
-                }
+                // 1. getValue값을 하나 낮춰준다. (0이면 삭제할 예정)
+                // 2. 기다려야 하는 시간을 구한다. 만약 시작 시간이 첫번째 상담 끝나는 시간보다 크거나 같으면 대기시간은 0이다.
+                // 3. 새로운 endTime을 endTimeQue에 추가한다. endTime은 startTime+waitingTime+period.
+                endTimeQue[type].put(entry.getKey(), entry.getValue()-1); // 1. getValue값을 하나 낮춰준다.
+                if(endTimeQue[type].firstEntry().getValue() == 0){ endTimeQue[type].pollFirstEntry();} // 1. Value값이 0이면 제거.
+                int waitingTime = entry.getKey() - startTime; // 2. 기다려야 하는 시간을 구하기
+                if(waitingTime<0) waitingTime = 0; // 2. 만약 시작 시간이 첫번쨰 상담 끝나는 시간보다 크거나 같은 경우, 대기시간은 0이다.
+                int endTime = startTime + waitingTime + period; // 3. 새로운 endTime을 구하기
+                endTimeQue[type].put(endTime, endTimeQue[type].getOrDefault(endTime, 0)+1); // 3. 새로운 endTime을 endTimeQue에 추가.
+                answerCandidate += waitingTime;
+                if(answer[0]!=0 && answerCandidate>answer[0]) return; // 중간에 answer[0]보다 커지면 중단.
             }
-        }
+        } if(answer[0]==0 || answer[0] > answerCandidate) answer[0] = answerCandidate;
     }
 }
