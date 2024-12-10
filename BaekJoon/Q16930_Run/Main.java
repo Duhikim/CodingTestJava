@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class Main {
 public static class Point {
@@ -52,32 +53,31 @@ public static class Point {
         
     }
     public static void init(Point[][] Matrix, int sX, int sY, int K, int eX, int eY){
-        ArrayDeque<ArrayList<Integer>> curQueFromFront = new ArrayDeque<>();
-        ArrayDeque<ArrayList<Integer>> nextQueFromFront;
-        ArrayDeque<ArrayList<Integer>> curQueFromBack = new ArrayDeque<>();
-        ArrayDeque<ArrayList<Integer>> nextQueFromBack;
+        LinkedList<Point> curQueFromFront = new LinkedList<>();
+        LinkedList<Point> nextQueFromFront;
+        LinkedList<Point> curQueFromBack = new LinkedList<>();
+        LinkedList<Point> nextQueFromBack;
     
         int cost = 0;
         Matrix[sX][sY].visitedFromFront = true;
         Matrix[sX][sY].cost = cost;
-        curQueFromFront.add(new ArrayList<>(Arrays.asList(sX,sY)));
+        curQueFromFront.add(Matrix[sX][sY]);
         
         Matrix[eX][eY].visitedFromBack = true;
         Matrix[eX][eY].cost = cost;
-        curQueFromBack.add(new ArrayList<>(Arrays.asList(eX,eY)));
+        curQueFromBack.add(Matrix[eX][eY]);
         
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
-        int size1 = 10, size2 = 10;
         
         do {
             cost++;
-            nextQueFromFront = new ArrayDeque<>(size1);
-            nextQueFromBack = new ArrayDeque<>(size2);
+            nextQueFromFront = new LinkedList<>();
+            nextQueFromBack = new LinkedList<>();
             
             while (!curQueFromFront.isEmpty()) {
-                int tempX = curQueFromFront.peekFirst().get(0);
-                int tempY = curQueFromFront.pollFirst().get(1);
+                int tempX = curQueFromFront.peekFirst().x;
+                int tempY = curQueFromFront.pollFirst().y;
                 
                 for(int dir=0; dir<4; dir++) { //Up, Down, Left, Right 순서로 탐색.
                     for (int i = 1; i <= K; i++) {  // 한 칸 ~ K 칸까지 탐색
@@ -86,22 +86,20 @@ public static class Point {
                         if (x < 0 || y < 0 || x >= Matrix.length || y >= Matrix[0].length
                                 || !Matrix[x][y].isWay) break; // 벽을 만나거나 범위에서 벗어나면 그 방향 탐색 종료.
                         if (Matrix[x][y].visitedFromFront) { continue; } // 이미 방문한 노드면 패스(탐색은 계속해야한다)
-                        if(Matrix[x][y].visitedFromBack) {
+                        if (Matrix[x][y].visitedFromBack) {
                             System.out.println(Matrix[x][y].cost + cost); // 출력물
                             return;
                         }
                         Matrix[x][y].cost = cost;
                         Matrix[x][y].visitedFromFront = true;
-                        ArrayList<Integer> coord =
-                                new ArrayList<>(Arrays.asList(x, y));
-                        nextQueFromFront.add(coord);
+                        nextQueFromFront.add(Matrix[x][y]);
                     }
                 }
             }
             
             while(!curQueFromBack.isEmpty()) {
-                int tempX = curQueFromBack.peekFirst().get(0);
-                int tempY = curQueFromBack.pollFirst().get(1);
+                int tempX = curQueFromBack.peekFirst().x;
+                int tempY = curQueFromBack.pollFirst().y;
                 
                 for(int dir=0; dir<4; dir++) { //Up, Down, Left, Right 순서로 탐색.
                     for (int i = 1; i <= K; i++) {  // 한 칸 ~ K 칸까지 탐색
@@ -116,16 +114,13 @@ public static class Point {
                         }
                         Matrix[x][y].cost = cost;
                         Matrix[x][y].visitedFromBack = true;
-                        ArrayList<Integer> coord =
-                                new ArrayList<>(Arrays.asList(x, y));
-                        nextQueFromBack.add(coord);
+                        nextQueFromBack.add(Matrix[x][y]);
                     }
                 }
             }
             
             curQueFromFront = nextQueFromFront;
             curQueFromBack = nextQueFromBack;
-            size1 = curQueFromFront.size(); size2 = nextQueFromBack.size();
             
         }while(!nextQueFromBack.isEmpty() && !nextQueFromFront.isEmpty());
         System.out.println("-1");
