@@ -7,7 +7,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Main {
+public class Main_ver3 {
 public static class Point {
         int x;
         int y;
