@@ -87,7 +87,7 @@ public static class Point {
                                 || !Matrix[x][y].isWay) break; // 벽을 만나거나 범위에서 벗어나면 그 방향 탐색 종료.
                         if (Matrix[x][y].visitedFromFront) { continue; } // 이미 방문한 노드면 패스(탐색은 계속해야한다)
                         if (Matrix[x][y].visitedFromBack) {
-                            System.out.println(Matrix[x][y].cost + cost); // 출력물
+                            System.out.println(Matrix[x][y].cost + cost); // 종점. (출력)
                             return;
                         }
                         Matrix[x][y].cost = cost;
@@ -108,8 +108,8 @@ public static class Point {
                         if (x < 0 || y < 0 || x >= Matrix.length || y >= Matrix[0].length
                                 || !Matrix[x][y].isWay) break; // 벽을 만나거나 범위에서 벗어나면 그 방향 탐색 종료.
                         if (Matrix[x][y].visitedFromBack) { continue; } // 이미 방문한 노드면 패스(탐색은 계속해야한다)
-                        if(Matrix[x][y].visitedFromFront) {
-                            System.out.println(Matrix[x][y].cost + cost); // 출력물
+                        if (Matrix[x][y].visitedFromFront) {
+                            System.out.println(Matrix[x][y].cost + cost); // 종점. (출력)
                             return;
                         }
                         Matrix[x][y].cost = cost;
