@@ -3,7 +3,7 @@ package BaekJoon.Q16930_Run;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 public class Main {
 public static class Point {
@@ -50,31 +50,31 @@ public static class Point {
         
     }
     public static void init(Point[][] Matrix, int sX, int sY, int K, int eX, int eY){
-        LinkedList<Point> curQueFromFront = new LinkedList<>();
-        LinkedList<Point> nextQueFromFront;
-        LinkedList<Point> curQueFromBack = new LinkedList<>();
-        LinkedList<Point> nextQueFromBack;
+        ArrayDeque<Point> QueFromFront = new ArrayDeque<>();
+        ArrayDeque<Point> QueFromBack = new ArrayDeque<>();
     
         int cost = 0;
         Matrix[sX][sY].visitedFromFront = true;
         Matrix[sX][sY].cost = cost;
-        curQueFromFront.add(Matrix[sX][sY]);
+        QueFromFront.add(Matrix[sX][sY]);
+        int sizeOfQueFromFront = 1;
         
         Matrix[eX][eY].visitedFromBack = true;
         Matrix[eX][eY].cost = cost;
-        curQueFromBack.add(Matrix[eX][eY]);
+        QueFromBack.add(Matrix[eX][eY]);
+        int sizeOfQueFromBack = 1;
         
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
         
         do {
             cost++;
-            nextQueFromFront = new LinkedList<>();
-            nextQueFromBack = new LinkedList<>();
-            
-            while (!curQueFromFront.isEmpty()) {
-                int tempX = curQueFromFront.peekFirst().x;
-                int tempY = curQueFromFront.pollFirst().y;
+           
+            int size = sizeOfQueFromFront;
+            sizeOfQueFromFront = 0;
+            for (; size >0; size--) {
+                int tempX = QueFromFront.peekFirst().x;
+                int tempY = QueFromFront.pollFirst().y;
                 
                 for(int dir=0; dir<4; dir++) { //Up, Down, Left, Right 순서로 탐색.
                     for (int i = 1; i <= K; i++) {  // 한 칸 ~ K 칸까지 탐색
@@ -89,14 +89,17 @@ public static class Point {
                         }
                         Matrix[x][y].cost = cost;
                         Matrix[x][y].visitedFromFront = true;
-                        nextQueFromFront.add(Matrix[x][y]);
+                        QueFromFront.addLast(Matrix[x][y]);
+                        sizeOfQueFromFront++;
                     }
                 }
             }
             
-            while(!curQueFromBack.isEmpty()) {
-                int tempX = curQueFromBack.peekFirst().x;
-                int tempY = curQueFromBack.pollFirst().y;
+            size = sizeOfQueFromBack;
+            sizeOfQueFromBack = 0;
+            for(; size > 0; size--) {
+                int tempX = QueFromBack.peekFirst().x;
+                int tempY = QueFromBack.pollFirst().y;
                 
                 for(int dir=0; dir<4; dir++) { //Up, Down, Left, Right 순서로 탐색.
                     for (int i = 1; i <= K; i++) {  // 한 칸 ~ K 칸까지 탐색
@@ -111,15 +114,12 @@ public static class Point {
                         }
                         Matrix[x][y].cost = cost;
                         Matrix[x][y].visitedFromBack = true;
-                        nextQueFromBack.add(Matrix[x][y]);
+                        QueFromBack.addLast(Matrix[x][y]);
+                        sizeOfQueFromBack++;
                     }
                 }
             }
-            
-            curQueFromFront = nextQueFromFront;
-            curQueFromBack = nextQueFromBack;
-            
-        }while(!nextQueFromBack.isEmpty() && !nextQueFromFront.isEmpty());
+        }while(sizeOfQueFromFront>0 && sizeOfQueFromBack>0);
         System.out.println("-1");
     }
 }
