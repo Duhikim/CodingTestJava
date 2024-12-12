@@ -1,9 +1,10 @@
 package CodingTestStudy.MultiplicationTable;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Solution {
+public class Solution_ver2 {
 /************************
  * 억억단은 1억 x 1억 크기의 행렬입니다. 억억단을 외우던 영우는 친구 수연에게 퀴즈를 내달라고 부탁하였습니다.
  * 수연은 평범하게 문제를 내봐야 영우가 너무 쉽게 맞히기 때문에 좀 어렵게 퀴즈를 내보려고 합니다.
@@ -28,7 +29,7 @@ public class Solution {
  *************************/
 
 public static void main(String[] args) {
-    Solution sol = new Solution();
+    Solution_ver2 sol = new Solution_ver2();
     int e = 8;
     int[] starts = {1,3,7,4,6,8,9};
     int[] result = {6,6,8};
@@ -41,60 +42,33 @@ public static void main(String[] args) {
     public int[] solution(int e, int[] starts) {
         int[] answer = new int[starts.length];
         
-        int[] table = new int[e+1]; // e개의 배열, 기본적으로 0으로 초기화.
+        int[][] table = new int[e+1][2]; // e개의 배열, 기본적으로 0으로 초기화.
         
         int div = 1;
         int discriminant = (e/div - (div-1)); // 판별식
         while(discriminant > 0 ){
-            table[div*div]++;
+            table[div*div][0] = div*div;
+            table[div*div][1]++;
             for(int i=div+1; i<= e/div; i++){
-                table[i*div] += 2;
+                table[i*div][0] = i*div;
+                table[i*div][1] += 2;
             }
-            
             div++;
             discriminant = (e/div - (div-1));
         }
-        int max = 0;
-        int value = Integer.MAX_VALUE; // table의 index역할
-        for(int i=0; i<=e; i++){
-            if(table[i] > max) {
-                max = table[i];
-                value = i;
-            }
-            else if(table[i] == max && i < value){
-                value = i;
-            }
-        }
+        Arrays.sort(table, (o1, o2)->
+        {if(o2[1]==o1[1]) { return o1[0] - o2[0]; }
+                    else { return o2[1] - o1[1];}}); // table[idx][1] 기준 내림차순
         
-        
-
-
-        TreeMap<Integer, Integer> idxMap = new TreeMap<>();
         for(int i=0; i<starts.length; i++){
-            idxMap.put(starts[i], i);
-        }
-        
-        int max_temp = 0;
-        int value_temp = Integer.MAX_VALUE;
-
-        for(Map.Entry<Integer, Integer> entry: idxMap.entrySet()){
-            if(entry.getKey() <= value) answer[entry.getValue()] = value;
-            else{
-                for(int i=entry.getKey(); i<=e; i++){
-                    if(table[i] > max_temp) {
-                        max_temp = table[i];
-                        value_temp = i;
-                    }
-                    else if(table[i] == max_temp && i < value_temp){
-                        value_temp = i;
-                    }
+            for(int j=0; j<table.length; j++){
+                if(table[j][0] >= starts[i]){
+                    answer[i] = table[j][0];
+                    break;
                 }
-                answer[entry.getValue()] = value_temp;
-                value = value_temp;
-                max_temp = 0;
-                value_temp = Integer.MAX_VALUE;
             }
         }
+        
         
         
         return answer;
