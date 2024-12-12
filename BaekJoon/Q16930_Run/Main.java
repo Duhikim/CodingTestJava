@@ -64,7 +64,7 @@ public static class Point {
         QueFromBack.add(Matrix[eX][eY]);
         int sizeOfQueFromBack = 1;
         
-        int[] dx = {-1, 1, 0, 0};
+        int[] dx = {-1, 1, 0, 0}; // UP DOWN LEFT RIGHT
         int[] dy = {0, 0, -1, 1};
         
         do {
