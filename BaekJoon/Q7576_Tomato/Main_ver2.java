@@ -1,4 +1,4 @@
-package BaekJoon.Tomato;
+package BaekJoon.Q7576_Tomato;
 
 import java.io.BufferedReader;
 import java.io.IOException;
