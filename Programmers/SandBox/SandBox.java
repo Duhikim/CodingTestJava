@@ -4,13 +4,21 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 
 public class SandBox {
-
+static int read() throws Exception {
+    int c, n = System.in.read() & 15;
+    boolean m = n == 13;
+    if (m)n = System.in.read() & 15;
+    while ((c = System.in.read()) >= 48) {
+        n = (n << 3) + (n << 1) + (c & 15);}
+    return m ? ~n + 1 : n;
+}
 public static void main(String[] args) throws Exception {
         /****************************
          <샌드 박스에서 실험을 통해 알게 된 사실들 메모>
@@ -28,79 +36,18 @@ public static void main(String[] args) throws Exception {
                     List는 인터페이스지만 asList를 하면 ArrayList와 비슷한 클래스의 객체가 생성된다. 하지만 이 객체는 고정 객체로, remove나 add가 되지 않는다.
          ******************************/
         
-        // Test with System.in.read()
-        long startTime = System.nanoTime();
-        String str = readString();
-        long endTime = System.nanoTime();
-        System.out.println("System.in.read() took: " + (endTime - startTime) + " ns");
-        
-        // Test with BufferedReader
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        startTime = System.nanoTime();
-        String input = br.readLine();
-        endTime = System.nanoTime();
-        System.out.println("BufferedReader took: " + (endTime - startTime) + " ns");
-    
-    startTime = System.nanoTime();
-    double doub = readDouble();
-    endTime = System.nanoTime();
-    System.out.println("System.in.read() took: " + (endTime - startTime) + " ns");
-    
-    // Test with BufferedReader
-    br = new BufferedReader(new InputStreamReader(System.in));
-    startTime = System.nanoTime();
-    String strToDoub = br.readLine();
-    double doub2 = Double.parseDouble(strToDoub);
-    endTime = System.nanoTime();
-    System.out.println("BufferedReader took: " + (endTime - startTime) + " ns");
-    
-    startTime = System.nanoTime();
-    int integ1 = readInt();
-    endTime = System.nanoTime();
-    System.out.println("System.in.read() took: " + (endTime - startTime) + " ns");
-    
-    // Test with BufferedReader
-    br = new BufferedReader(new InputStreamReader(System.in));
-    startTime = System.nanoTime();
-    String strToInt = br.readLine();
-    int integ2 = Integer.parseInt(strToDoub);
-    endTime = System.nanoTime();
-    System.out.println("BufferedReader took: " + (endTime - startTime) + " ns");
-    
-    
-    }
-
-static String readString() throws Exception {
-    int c;
-    StringBuilder sb = new StringBuilder();
-    
-    while ((c = System.in.read()) != '\n' && c != -1) {
-        sb.append((char)c);
-    }
-    return sb.toString();
-        
-    }
-public static double readDouble() throws Exception {
-    int c, n = System.in.read() & 15;
-    boolean m = n==13;
-    if(m) n = System.in.read() & 15;
-    while((c = System.in.read()) >= 48){
-        n = (n<<3) + (n<<1) + (c & 15);
-    }
-    double d=0;
-    int exp = 10;
-    if(c==46) while((c = System.in.read()) >= 48) {
-        d += (double)(c & 15) / (double)exp; exp *= 10;
-    }
-    return (double)n+d;
-}
-
-public static int readInt() throws Exception {
-    int c, n = System.in.read() & 15;
-    boolean m = n == 13;
-    if (m)n = System.in.read() & 15;
-    while ((c = System.in.read()) >= 48) {
-        n = (n << 3) + (n << 1) + (c & 15);}
-    return m ? ~n + 1 : n;
+      int a= read();
+      int b = read();
+      
+      ArrayList<Integer> myList = new ArrayList<>();
+      for(int i=0; i<10; i++)
+          myList.add(i);
+      Integer[] arr = myList.toArray(Integer[]::new);
+      ArrayDeque<Integer> myDeque = new ArrayDeque<>();
+      myDeque = new ArrayDeque<>(myList);
+      //myDeque = myList.stream().collect(ArrayDeque::new, ArrayDeque::add, ArrayDeque::addAll);
+    //myDeque = myList.stream().collect(Collectors.toCollection(ArrayDeque<Integer>::new));
+      
+      System.out.println(a + " " + b);
 }
 }
