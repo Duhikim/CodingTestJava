@@ -1,6 +1,6 @@
 package CodingTestStudy.CorrectParenthesis;
 
-class Solution {
+class Solution_ver1 {
 public static void main(String[] args) {
     StringBuilder sb = new StringBuilder("1234");
     System.out.println(sb.isEmpty());
