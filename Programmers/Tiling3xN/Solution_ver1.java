@@ -1,6 +1,6 @@
 package CodingTestStudy.Tiling3xN;
 
-class Solution {
+class Solution_ver1 {
 
 	public int solution(int n) {
 		/**************
