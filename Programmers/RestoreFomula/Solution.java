@@ -85,6 +85,11 @@ public class Solution {
 		}
 		return answer;
 	}
+
+	public static void main(String[] args) {
+		Solution sol = new Solution();
+
+	}
 	// 진수를 구하는 함수
 	public int getBase(Formula[] formulas) {
 		int A, B, C, decC;
@@ -94,10 +99,12 @@ public class Solution {
 			B = formula.b;
 			C = Integer.parseInt(formula.C);
 			decC = (formula.plus) ? (A + B) : (A - B);
-			if (C == decC) continue;
-
+			int gap = Math.abs(C-decC);
+			if (gap == 0) continue;
+			if (gap < 10) return 10-(gap);
 			if (C % 10 != decC % 10) {
-				return 10 - Math.abs(C % 10 - decC % 10);
+				return (decC % 10 != 0)? (decC%10 - C%10) : 10- C%10;
+				//return 10 - Math.abs(C % 10 - decC % 10);
 			} else {
 				return 10 - (C / 10 - decC / 10);
 			}
