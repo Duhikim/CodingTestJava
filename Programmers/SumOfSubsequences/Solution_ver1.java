@@ -1,8 +1,8 @@
 package CodingTestStudy.SumOfSubsequences;
 
-public class Solution {
+public class Solution_ver1 {
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		int[] sqc = {2, 2, 2, 2, 2};
 		sol.solution(sqc, 6);
 	}
