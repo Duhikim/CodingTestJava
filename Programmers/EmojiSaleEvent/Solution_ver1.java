@@ -19,33 +19,32 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class Solution {
+public class Solution_ver1 {
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		int[][] users = {{40, 10000}, {25, 10000}};
 		int[] emoticons = {7000, 9000};
 		sol.solution(users, emoticons);
 	}
 
 	public class Users {
-		int saleRate;
+		int wantedRate;
 		int maxPrice;
 		boolean plusService;
 		int totalPrice;
 
 		public Users(int[] rateAndPrice){
-			this.saleRate = rateAndPrice[0];
+			this.wantedRate = rateAndPrice[0];
 			this.maxPrice = rateAndPrice[1];
 			this.plusService = false;
 			this.totalPrice = 0;
 		}
 		public void buyItem(int rate, int price){
-			if(rate >= saleRate){
-				totalPrice += price * (100 - rate) / 100;
-				if(totalPrice>=maxPrice) {
+			if(rate < wantedRate) return;
+			totalPrice += price * (100 - rate) / 100;
+			if(totalPrice>=maxPrice) {
 				totalPrice = 0;
 				plusService = true;
-				}
 			}
 		}
 		public int[] buyItems(int[] rates, int[] prices){
