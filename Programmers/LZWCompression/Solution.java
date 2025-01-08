@@ -10,14 +10,13 @@ public class Solution {
 
 		HashMap<String, Integer> dictionary = new HashMap<>();
 		for(int i=0; i< 26; i++){
-			String alphabet = "" + (char)(i+'A');
-			dictionary.put(alphabet, i+1);
+			dictionary.put(Character.toString(i+'A'), i+1);
 		}
 
 		int len = msg.length();
 
 		for(int i=0; i<len; i++){
-			String temp1 = "" + msg.charAt(i), temp2 = "";
+			String temp1 = Character.toString(msg.charAt(i)), temp2 = "";
 			int idx = i;
 			while(dictionary.containsKey(temp1)){
 				temp2 = temp1;
