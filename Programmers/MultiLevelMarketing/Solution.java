@@ -19,19 +19,7 @@ public class Solution {
 		}
 	}
 
-	public static void main(String[] args) {
-		Solution sol = new Solution();
-		String[] enroll = {"john", "mary", "edward", "sam", "emily", "jaimie", "tod", "young"};
-		String[] referral = {"-", "-", "mary", "edward", "mary", "mary", "jaimie", "edward"};
-		String[] seller = {"young", "john", "tod", "emily", "mary"};
-		int[] amount = {12, 4, 2, 5, 10};
-		sol.solution(enroll, referral, seller, amount);
-
-	}
-
 	public int[] solution(String[] enroll, String[] referral, String[] seller, int[] amount) {
-
-
 		userList = new ArrayList<>();
 		userList.add(new Sellers("center", "none"));
 		userMap = new HashMap<>();
