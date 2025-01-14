@@ -101,26 +101,82 @@ public class Solution {
 		}
 
 		public void mergeTo(Cell cell){ // cell이 주인이 되고 this를 먹을 거임.
-			if(cell.merged && cell.mergedTo == this) {
-				cell.mergeTo(this);
-				return; // 주인으로 삼으려는 cell이 이미 내 자식이면 아무것도 안해야 한다.
-			}
-			if(cell.merged && cell.mergedTo != null){
-				this.mergeTo(cell.mergedTo);
-				return;
+			// 이미 같은 셀인지 확인해야 함.
+			// 합칠 때 셀대 셀, 셀대 그룹, 그룹대 셀, 그룹대 그룹 네가지 경우를 나눠서 해보자.
+
+			// 1. 셀대 셀 : 두 셀이 같은 경우 앞에서 갈리지만 조건 한번 더 추가.
+			if(!this.merged && !cell.merged){
+				if(this == cell) return;
+				this.merged = true;
+				cell.merged = true;
+				cell.mergedFrom.add(this);
+				this.mergedTo = cell;
+				if(cell.getValue().isEmpty()) cell.setValue(this.value);
+				this.value = "";
 			}
 
-			this.merged = true;
-			cell.merged = true;
-			cell.mergedFrom.addAll(this.mergedFrom); // this가 이전 merge의 주체였다면 멤버들을 cell이 다 가져감.
-			cell.mergedFrom.add(this);
-			for(Cell c: this.mergedFrom) c.mergedTo = cell;
-			this.mergedTo = cell;
-			this.mergedFrom.clear();
+			// 2 셀대 그룹. 주인이 그룹. :
+			if(!this.merged && cell.merged){ // cell이 원래 그룹에서 주인인지 자식인지 봐야함.
+				this.merged = true;
+				if(cell.mergedTo == null) { // cell 이 원래 그룹에서의 주인임
+					this.mergedTo = cell;
+					cell.mergedFrom.add(this);
+					if(cell.getValue().isEmpty()) cell.setValue(this.value);
+					this.value = "";
+				}
+				else{ // cell이 원래 그룹에서 주인이 아님.
+					this.mergedTo = cell.mergedTo;
+					cell.mergedFrom.add(this);
+					if(cell.mergedTo.getValue().isEmpty()) cell.mergedTo.setValue(this.value);
+					this.value = "";
+				}
+			}
 
-			// value는 둘중에 한 개가 있으면 그걸 쓰고 둘다 있으면 주인의 value를 쓴다.
-			if(cell.getValue().isEmpty()) cell.setValue(this.value);
-			this.value = "";
+			// 3. 그룹대 셀. 주인이 셀.
+			else if(this.merged && !cell.merged){ // this가 원래 그룹에서 주인인지 자식인지 봐야함.
+				cell.merged = true;
+				if(this.mergedTo == null){ // this이 원래 그룹에서의 주인임
+					cell.mergedFrom.addAll(this.mergedFrom);
+					cell.mergedFrom.add(this);
+					this.mergedTo = cell;
+					if(cell.getValue().isEmpty()) cell.setValue(this.value);
+					this.value = "";
+				}
+
+			}
+
+			// 4. 그룹대 그룹. : 그룹과 그룹이 같은 그룹일 수도 있음.
+			else{ // this가 주인인지 자식인지, cell이 주인인지 자식인지에 따라 4가지 경우가 발생함.
+				Cell thisParent = this;
+				Cell cellParent = cell;
+				if(this.mergedTo != null) thisParent = this.mergedTo;
+				if(cell.mergedTo != null) cellParent = cell.mergedTo;
+				if(thisParent == cellParent) return;
+				cellParent.mergedFrom.addAll(thisParent.mergedFrom);
+				cellParent.mergedFrom.add(thisParent);
+				thisParent.mergedTo = cellParent;
+				if(cellParent.getValue().isEmpty()) cellParent.setValue(thisParent.value);
+				thisParent.value = "";
+			}
+
+
+
+//			if(cell.merged && cell.mergedTo != null){
+//				this.mergeTo(cell.mergedTo);
+//				return;
+//			}
+//
+//			this.merged = true;
+//			cell.merged = true;
+//			cell.mergedFrom.addAll(this.mergedFrom); // this가 이전 merge의 주체였다면 멤버들을 cell이 다 가져감.
+//			cell.mergedFrom.add(this);
+//			for(Cell c: this.mergedFrom) c.mergedTo = cell;
+//			this.mergedTo = cell;
+//			this.mergedFrom.clear();
+//
+//			// value는 둘중에 한 개가 있으면 그걸 쓰고 둘다 있으면 주인의 value를 쓴다.
+//			if(cell.getValue().isEmpty()) cell.setValue(this.value);
+//			this.value = "";
 		}
 
 		public void unMerge(){
@@ -132,7 +188,7 @@ public class Solution {
 				}
 				this.merged = false;
 				this.mergedFrom.clear();
-				this.setValue("");
+				this.value = "";
 			}
 
 			else{
@@ -172,13 +228,13 @@ public class Solution {
 				"MERGE 1 2 1 3", "MERGE 1 3 1 4", "UPDATE korean hansik", "UPDATE 1 3 group", "UNMERGE 1 4",
 				"PRINT 1 3", "PRINT 1 4"};
 */
-		/*String[] commands = {"UPDATE 1 1 a", "UPDATE 1 2 b", "UPDATE 2 1 c", "UPDATE 2 2 d", "MERGE 1 1 1 2",
+		String[] commands = {"UPDATE 1 1 a", "UPDATE 1 2 b", "UPDATE 2 1 c", "UPDATE 2 2 d", "MERGE 1 1 1 2",
 				"MERGE 2 2 2 1", "MERGE 2 1 1 1", "PRINT 1 1", "UNMERGE 2 2", "PRINT 1 1"};
 
-		 */
 
+/*
 		String[] commands = {"MERGE 1 1 1 2","MERGE 1 2 1 1", "PRINT 1 1"};
-
+*/
 		String[] result = sol.solution(commands);
 		for(String str: result) System.out.println(str);
 	}
