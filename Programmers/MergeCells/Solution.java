@@ -26,14 +26,18 @@ public class Solution {
 			String[] str = command.split(" ");
 			if(str[0].equals("UPDATE")){
 				if(str.length==4) {
-					Update(Integer.parseInt(str[1])-1, Integer.parseInt(str[2])-1, str[3]);
 					if(maxX<Integer.parseInt(str[1])) maxX = Integer.parseInt(str[1]);
 					if(maxY<Integer.parseInt(str[2])) maxY = Integer.parseInt(str[2]);
+					Update(Integer.parseInt(str[1])-1, Integer.parseInt(str[2])-1, str[3]);
 				}
 				else if(str.length==3) Update(str[1], str[2]);
 				else System.out.println("Input error");
 			}
 			else if(str[0].equals("MERGE")){
+				if(maxX<Integer.parseInt(str[1])) maxX = Integer.parseInt(str[1]);
+				if(maxY<Integer.parseInt(str[2])) maxY = Integer.parseInt(str[2]);
+				if(maxX<Integer.parseInt(str[3])) maxX = Integer.parseInt(str[3]);
+				if(maxY<Integer.parseInt(str[4])) maxY = Integer.parseInt(str[4]);
 				Merge(Integer.parseInt(str[1])-1, Integer.parseInt(str[2])-1, Integer.parseInt(str[3])-1, Integer.parseInt(str[4])-1);
 			}
 			else if (str[0].equals("UNMERGE")){
@@ -52,7 +56,8 @@ public class Solution {
 			ArrayList<Cell> result = new ArrayList<>();
 			for(int i=0; i<maxX; i++){
 				for(int j=0; j<maxY; j++){
-					if(cells[i][j].getValue().equals(value)) result.add(cells[i][j]);
+					if(cells[i][j].mergedTo == null && cells[i][j].getValue().equals(value))
+						result.add(cells[i][j]);
 				}
 			}
 			return result;
@@ -60,7 +65,6 @@ public class Solution {
 		public void Update(String value1, String value2){
 			ArrayList<Cell> foundCells = findByValue(value1);
 			for(Cell cell: foundCells){
-				if(cell.merged && cell.mergedTo != null) continue;
 				cell.setValue(value2);
 			}
 		}
@@ -92,120 +96,60 @@ public class Solution {
 		}
 
 		public void setValue(String value){
-			if(this.merged && this.mergedTo != null){
-				mergedTo.setValue(value);
-			}
-			else{
-				this.value = value;
-			}
+			Cell thisParent = this;
+			if(thisParent.mergedTo != null) thisParent = thisParent.mergedTo;
+
+			thisParent.value = value;
 		}
 
 		public void mergeTo(Cell cell){ // cell이 주인이 되고 this를 먹을 거임.
-			// 이미 같은 셀인지 확인해야 함.
-			// 합칠 때 셀대 셀, 셀대 그룹, 그룹대 셀, 그룹대 그룹 네가지 경우를 나눠서 해보자.
 
-			// 1. 셀대 셀 : 두 셀이 같은 경우 앞에서 갈리지만 조건 한번 더 추가.
-			if(!this.merged && !cell.merged){
-				if(this == cell) return;
-				this.merged = true;
-				cell.merged = true;
-				cell.mergedFrom.add(this);
-				this.mergedTo = cell;
-				if(cell.getValue().isEmpty()) cell.setValue(this.value);
-				this.value = "";
+			Cell thisParent = this;
+			Cell cellParent = cell;
+
+			if(thisParent.merged && thisParent.mergedTo != null) thisParent = thisParent.mergedTo;
+			if(cellParent.merged && cellParent.mergedTo != null) cellParent = cellParent.mergedTo;
+			if(thisParent == cellParent) return;
+
+			thisParent.merged = true;
+			cellParent.merged = true;
+			for(Cell c : thisParent.mergedFrom){
+				c.mergedTo = cellParent;
 			}
+			thisParent.mergedTo = cellParent;
+			cellParent.mergedFrom.addAll(thisParent.mergedFrom);
+			cellParent.mergedFrom.add(thisParent);
 
-			// 2 셀대 그룹. 주인이 그룹. :
-			if(!this.merged && cell.merged){ // cell이 원래 그룹에서 주인인지 자식인지 봐야함.
-				this.merged = true;
-				if(cell.mergedTo == null) { // cell 이 원래 그룹에서의 주인임
-					this.mergedTo = cell;
-					cell.mergedFrom.add(this);
-					if(cell.getValue().isEmpty()) cell.setValue(this.value);
-					this.value = "";
-				}
-				else{ // cell이 원래 그룹에서 주인이 아님.
-					this.mergedTo = cell.mergedTo;
-					cell.mergedFrom.add(this);
-					if(cell.mergedTo.getValue().isEmpty()) cell.mergedTo.setValue(this.value);
-					this.value = "";
-				}
-			}
+			if(cellParent.getValue().isEmpty()) cellParent.setValue(thisParent.value);
+			thisParent.value = "";
 
-			// 3. 그룹대 셀. 주인이 셀.
-			else if(this.merged && !cell.merged){ // this가 원래 그룹에서 주인인지 자식인지 봐야함.
-				cell.merged = true;
-				if(this.mergedTo == null){ // this이 원래 그룹에서의 주인임
-					cell.mergedFrom.addAll(this.mergedFrom);
-					cell.mergedFrom.add(this);
-					this.mergedTo = cell;
-					if(cell.getValue().isEmpty()) cell.setValue(this.value);
-					this.value = "";
-				}
-
-			}
-
-			// 4. 그룹대 그룹. : 그룹과 그룹이 같은 그룹일 수도 있음.
-			else{ // this가 주인인지 자식인지, cell이 주인인지 자식인지에 따라 4가지 경우가 발생함.
-				Cell thisParent = this;
-				Cell cellParent = cell;
-				if(this.mergedTo != null) thisParent = this.mergedTo;
-				if(cell.mergedTo != null) cellParent = cell.mergedTo;
-				if(thisParent == cellParent) return;
-				cellParent.mergedFrom.addAll(thisParent.mergedFrom);
-				cellParent.mergedFrom.add(thisParent);
-				thisParent.mergedTo = cellParent;
-				if(cellParent.getValue().isEmpty()) cellParent.setValue(thisParent.value);
-				thisParent.value = "";
-			}
-
-
-
-//			if(cell.merged && cell.mergedTo != null){
-//				this.mergeTo(cell.mergedTo);
-//				return;
-//			}
-//
-//			this.merged = true;
-//			cell.merged = true;
-//			cell.mergedFrom.addAll(this.mergedFrom); // this가 이전 merge의 주체였다면 멤버들을 cell이 다 가져감.
-//			cell.mergedFrom.add(this);
-//			for(Cell c: this.mergedFrom) c.mergedTo = cell;
-//			this.mergedTo = cell;
-//			this.mergedFrom.clear();
-//
-//			// value는 둘중에 한 개가 있으면 그걸 쓰고 둘다 있으면 주인의 value를 쓴다.
-//			if(cell.getValue().isEmpty()) cell.setValue(this.value);
-//			this.value = "";
 		}
 
 		public void unMerge(){
+			if(!this.merged) return; // 단일 셀이면 아무 작업도 안함.
 
-			if(this.mergedTo == null){
-				for(Cell c : this.mergedFrom){
-					c.merged = false;
-					c.mergedTo = null;
-				}
-				this.merged = false;
-				this.mergedFrom.clear();
-				this.value = "";
+			Cell thisParent = this;
+			if(thisParent.mergedTo != null) thisParent = thisParent.mergedTo;
+			for(Cell c : thisParent.mergedFrom){
+				c.value = "";
+				c.merged = false;
+				c.mergedTo = null;
+				c.mergedFrom.clear();
 			}
-
-			else{
-				this.mergedTo.unMerge();
-			}
+			thisParent.value = "";
+			thisParent.merged = false;
+			thisParent.mergedTo = null;
+			thisParent.mergedFrom.clear();
 		}
 
 		public String getValue(){
-			if(this.merged){
-				if(this.mergedTo == null){ return this.value;}
-				return this.mergedTo.getValue();
-			}
-			return this.value;
+			Cell thisParent = this;
+			if(thisParent.mergedTo != null) thisParent = thisParent.mergedTo;
+			return thisParent.value;
 		}
 
 		public String toString() {
-			return (this.getValue().equals(""))? "EMPTY": this.getValue();
+			return (this.getValue().isEmpty())? "EMPTY": this.getValue();
 		}
 	}
 
