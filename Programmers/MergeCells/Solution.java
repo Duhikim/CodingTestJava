@@ -104,6 +104,7 @@ public class Solution {
 
 		public void mergeTo(Cell cell){ // cell이 주인이 되고 this를 먹을 거임.
 
+
 			Cell thisParent = this;
 			Cell cellParent = cell;
 
