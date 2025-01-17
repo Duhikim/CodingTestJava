@@ -49,7 +49,8 @@ public class Solution {
 				.replaceAll("D#", "d")
 				.replaceAll("F#", "f")
 				.replaceAll("G#", "g")
-				.replaceAll("A#", "a");
+				.replaceAll("A#", "a")
+				.replaceAll("B#", "b"); // B#은 존재하지 않으나 프로그래머스 테스트케이스에 들어가있음
 	}
 
 	public String solution(String m, String[] musicinfos) {
