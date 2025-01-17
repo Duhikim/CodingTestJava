@@ -35,15 +35,21 @@ public class Solution {
 	}
 
 	public String convertMelodies(String melody){
-		StringBuilder sb = new StringBuilder(melody);
-		for(int i=sb.length()-1; i>=0; i--){
-			if(sb.charAt(i) == '#') {
-				sb.setCharAt(i-1, (char)(sb.charAt(i-1)-'A'+'a'));
-				sb.deleteCharAt(i);
-				i--;
-			}
-		}
-		return sb.toString();
+//		StringBuilder sb = new StringBuilder(melody);
+//		for(int i=sb.length()-1; i>=0; i--){
+//			if(sb.charAt(i) == '#') {
+//				sb.setCharAt(i-1, (char)(sb.charAt(i-1)-'A'+'a'));
+//				sb.deleteCharAt(i);
+//				i--;
+//			}
+//		}
+//		return sb.toString();
+
+		return melody.replaceAll("C#", "c")
+				.replaceAll("D#", "d")
+				.replaceAll("F#", "f")
+				.replaceAll("G#", "g")
+				.replaceAll("A#", "a");
 	}
 
 	public String solution(String m, String[] musicinfos) {
