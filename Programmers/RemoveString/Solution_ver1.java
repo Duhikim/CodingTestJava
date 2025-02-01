@@ -1,6 +1,6 @@
 package CodingTestStudy.RemoveString;
 
-public class Solution
+public class Solution_ver1
 {
 	static StringList start = new StringList('0');
 
@@ -47,7 +47,7 @@ public class Solution
 	}
 
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		sol.solution("cdcd");
 	}
 }
