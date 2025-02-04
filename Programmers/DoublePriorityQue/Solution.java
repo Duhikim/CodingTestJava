@@ -1,4 +1,4 @@
-package CodingTestStudy.DequeExample;
+package CodingTestStudy.DoublePriorityQue;
 
 import java.util.LinkedList;
 
