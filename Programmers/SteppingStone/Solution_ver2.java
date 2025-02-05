@@ -17,9 +17,11 @@ package CodingTestStudy.SteppingStone;
 
  */
 
-public class Solution {
+public class Solution_ver2 {
 	public int solution(int[] stones, int k) {
+		if(stepping(stones) >= k) return 0; // 2번 예외 처리
 
+		int answer = 0;
 		int[] stonesClone = stones.clone();
 		int max = Integer.MIN_VALUE;
 		int min = Integer.MAX_VALUE;
@@ -29,10 +31,20 @@ public class Solution {
 		}
 		int mid = (min + max)/2;
 
+		if(min == max){
+			return min; // 1번 예외 처리
+		}
+		for (int i = 0; i < stones.length; i++) {
+			if (stonesClone[i] <= min) stonesClone[i] = 0;
+			else stonesClone[i] -= min;
+		}
+		if(stepping(stonesClone) >= k) return min; // 3번 예외 처리
+		stonesClone = stones.clone();
+
 		while(max > min+1) {
 			for (int i = 0; i < stones.length; i++) {
-				if (stonesClone[i] <= (mid-1)) stonesClone[i] = 0;
-				else stonesClone[i] -= (mid-1);
+				if (stonesClone[i] <= mid) stonesClone[i] = 0;
+				else stonesClone[i] -= mid;
 			}
 			if (stepping(stonesClone) < k) { // OK
 				stonesClone = stones.clone();
@@ -46,11 +58,14 @@ public class Solution {
 		}
 
 		for (int i = 0; i < stones.length; i++) {
-			if (stonesClone[i] <= (max-1)) stonesClone[i] = 0;
-			else stonesClone[i] -= (max-1);
+			if (stonesClone[i] <= max) stonesClone[i] = 0;
+			else stonesClone[i] -= max;
 		}
-		if(stepping(stonesClone) < k) return max;
-		else return min;
+		if(stepping(stonesClone) < k) answer = max;
+		else answer = min;
+
+
+		return answer+1;
 	}
 
 	public int stepping(int[] stones){
