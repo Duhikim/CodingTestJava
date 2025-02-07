@@ -1,9 +1,9 @@
+// ver1
+
 package CodingTestStudy.Changes;
-
-
 import java.util.Arrays;
 
-public class Solution {
+public class Solution_ver1 {
 	public int solution(int n, int[] money) {
 		int mod = 1_000_000_007;
 
@@ -18,6 +18,7 @@ public class Solution {
 		int pennyKind = money.length; // 동전의 종류
 
 		int[][] dp = new int[n+1][pennyKind]; // dp[A][B]는 A원을 만들기 위해 B번째 동전(오름차순기준)까지 썼을 때의 경우의 수가 저장된다.
+
 
 		// dp[*][0]은 money[0]으로 나뉘어 지면 1, 안나뉘면 0.
 		for(int i=0; i<dp.length; i++){
@@ -64,7 +65,7 @@ public class Solution {
 		}
 	}
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		int n=5;
 		int[] money = {1,2,5,10};
 		System.out.println(sol.solution(n, money));
