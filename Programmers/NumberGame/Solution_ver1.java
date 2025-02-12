@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class Solution {
+public class Solution_ver1 {
 	public int solution(int[] A, int[] B) {
 		int answer = 0;
 
