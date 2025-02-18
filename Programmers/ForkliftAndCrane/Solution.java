@@ -19,12 +19,11 @@ public class Solution {
 
 			for(int i=0; i<row; i++){
 				for(int j=0; j<col; j++){
-					boolean accessible = false;
-					if(i==0 || i==row-1 || j==0 || j==col-1) accessible = true;
-					containers[i][j] = new Container(storage[i].charAt(j), accessible);
+					containers[i][j] = new Container(storage[i].charAt(j), (i==0 || i==row-1 || j==0 || j==col-1));
 				}
 			}
 		}
+
 		public void removeWithForklift(char c){
 
 			for(int i=0; i<row; i++){
@@ -42,16 +41,16 @@ public class Solution {
 				makeNearAccessible(R, C);
 			}
 		}
+
 		public void makeNearAccessible(int R, int C){
+			containers[R][C].accessible = true;
 			int[] newR = {R+1, R-1, R, R};
 			int[] newC = {C, C, C+1, C-1};
 			for(int i=0; i<4; i++){
 				if(newR[i] < 0 || newR[i] >= row || newC[i] < 0 || newC[i] >= col) continue;
 				if(containers[newR[i]][newC[i]].accessible) continue;
-				if(containers[newR[i]][newC[i]].removed && !containers[newR[i]][newC[i]].visited) {
-					containers[R][C].visited = true;
+				if(containers[newR[i]][newC[i]].removed) {
 					makeNearAccessible(newR[i], newC[i]);
-					containers[R][C].visited = false;
 				}
 				containers[newR[i]][newC[i]].accessible = true;
 			}
@@ -79,13 +78,11 @@ public class Solution {
 		char value;
 		boolean accessible;
 		boolean removed;
-		boolean visited; // 재귀시 이미 방문한 노드인지 체크
 
 		public Container(char v, boolean acc){
 			this.value = v;
 			this.accessible = acc;
 			this.removed = false;
-			this.visited = false;
 		}
 	}
 
@@ -100,7 +97,6 @@ public class Solution {
 				cm.removeWithCrane(cmd.charAt(0));
 			}
 		}
-
 		return cm.remain;
 	}
 }
