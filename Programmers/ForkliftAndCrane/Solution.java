@@ -1,71 +1,106 @@
 package CodingTestStudy.ForkliftAndCrane;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class Solution {
-	int answer;
+	public class ContainerManager{
+		Container[][] containers;
+		int remain;
+		int row, col;
+		Queue<int[]> workQue;
+
+		public ContainerManager(String[] storage){
+			this.row = storage.length;
+			this.col = storage[0].length();
+			this.containers = new Container[row][col];
+			this.remain = row*col;
+			this.workQue = new ArrayDeque<>();
+
+			for(int i=0; i<row; i++){
+				for(int j=0; j<col; j++){
+					boolean accessible = false;
+					if(i==0 || i==row-1 || j==0 || j==col-1) accessible = true;
+					containers[i][j] = new Container(storage[i].charAt(j), accessible);
+				}
+			}
+		}
+		public void removeWithForklift(char c){
+
+			for(int i=0; i<row; i++){
+				for(int j=0; j<col; j++){
+					if (containers[i][j].value == c && containers[i][j].accessible && !containers[i][j].removed) {
+						workQue.add(new int[]{i, j});
+					}
+				}
+			}
+			while(!workQue.isEmpty()) {
+				int R = workQue.peek()[0];
+				int C = workQue.poll()[1];
+				containers[R][C].removed = true;
+				remain--;
+				makeNearAccessible(R, C);
+			}
+		}
+		public void makeNearAccessible(int R, int C){
+			int[] newR = {R+1, R-1, R, R};
+			int[] newC = {C, C, C+1, C-1};
+			for(int i=0; i<4; i++){
+				if(newR[i] < 0 || newR[i] >= row || newC[i] < 0 || newC[i] >= col) continue;
+				if(containers[newR[i]][newC[i]].accessible) continue;
+				if(containers[newR[i]][newC[i]].removed && !containers[newR[i]][newC[i]].visited) {
+					containers[R][C].visited = true;
+					makeNearAccessible(newR[i], newC[i]);
+					containers[R][C].visited = false;
+				}
+				containers[newR[i]][newC[i]].accessible = true;
+			}
+		}
+
+		public void removeWithCrane(char c){
+			for(int i=0; i<row; i++){
+				for(int j=0; j<col; j++){
+					if (containers[i][j].value == c && !containers[i][j].removed) {
+						workQue.add(new int[]{i, j});
+					}
+				}
+			}
+			while(!workQue.isEmpty()) {
+				int R = workQue.peek()[0];
+				int C = workQue.poll()[1];
+				containers[R][C].removed = true;
+				remain--;
+				if(containers[R][C].accessible) makeNearAccessible(R, C);
+			}
+		}
+	}
+
+	public class Container{
+		char value;
+		boolean accessible;
+		boolean removed;
+		boolean visited; // 재귀시 이미 방문한 노드인지 체크
+
+		public Container(char v, boolean acc){
+			this.value = v;
+			this.accessible = acc;
+			this.removed = false;
+			this.visited = false;
+		}
+	}
+
 	public int solution(String[] storage, String[] requests) {
-		// Accessible deque를 만들어서 지게차 운전할 때 데크를 한번 순회하며 모두 없애고 새로운 데크 생성.
-		// 크레인 운전할 때는 전체순회할건데, 만약 꺼내는 노드가 Accessible deque에 있으면 위 작업 수행.
-		answer = 0;
-		int n = storage.length;
-		int m = storage[0].length();
+		ContainerManager cm = new ContainerManager(storage);
 
-		char[][] containers = new char[n][m];
-		boolean[][] accessible = new boolean[n][m];
-		List<String> accessibleContainers = new ArrayList<>();
-
-		stackContainers(containers, storage, n, m);
-		makingTubes(accessible, accessibleContainers, n, m);
-
-		for(String request: requests){
-			if(requests.length==1){
-				driveForkLift(request.charAt(0), containers, accessible, accessibleContainers);
+		for(String cmd: requests){
+			if(cmd.length()==1){
+				cm.removeWithForklift(cmd.charAt(0));
 			}
 			else{
-				driveCrane(request.charAt(0), containers, accessible, accessibleContainers);
+				cm.removeWithCrane(cmd.charAt(0));
 			}
 		}
 
-		return answer;
-	}
-
-	public void driveForkLift(char T, char[][] containers, boolean[][] accessible, List<String> accessibleContainers){
-		for(int i=0; i<accessibleContainers.size(); i++){
-			String[] str = accessibleContainers.get(i).split(" ");
-			int r = Integer.parseInt(str[0]);
-			int c = Integer.parseInt(str[1]);
-			if(containers[r][c] == T){
-
-			}
-		}
-	}
-
-	public void driveCrane(char T, char[][] containers, boolean[][] accessible, List<String> accessibleContainers){
-
-	}
-
-	public void stackContainers(char[][] containers, String[] storage, int n, int m){
-		for(int i=0; i<n; i++){
-			for(int j=0; j<m; j++){
-				containers[i][j] = storage[i].charAt(j);
-			}
-		}
-	}
-
-	public void makingTubes(boolean[][] accessible, List<String> accessibleContainers, int n, int m){
-		for(int j=0; j<m; j++){
-			accessible[0][j] = true;
-			accessible[n-1][j] = true;
-			accessibleContainers.add(0+" "+j);
-			accessibleContainers.add(n-1+" "+j);
-		}
-		for(int i=1; i<n-1; i++){
-			accessible[i][0] = true;
-			accessible[i][m-1] = true;
-			accessibleContainers.add(i+" "+0);
-			accessibleContainers.add(i+" "+(m-1));
-		}
+		return cm.remain;
 	}
 }
