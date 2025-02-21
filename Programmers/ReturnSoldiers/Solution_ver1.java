@@ -1,8 +1,11 @@
 package CodingTestStudy.ReturnSoldiers;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 
-public class Solution {
+public class Solution_ver1 {
 	class NodeManager{
 		Node[] nodes;
 
@@ -15,24 +18,25 @@ public class Solution {
 			}
 
 			for(int[] road: roads){
-				nodes[road[0]].connection.add(nodes[road[1]]);
-				nodes[road[1]].connection.add(nodes[road[0]]);
+				nodes[road[0]].connection.add(road[1]);
+				nodes[road[1]].connection.add(road[0]);
 			}
 
 			setLevels(destination);
 		}
 
 		public void setLevels(int idx){
-			Queue<int[]> workQue = new ArrayDeque<>();
+			Queue<int[]> workQue = new PriorityQueue<>((a, b)->a[1]-b[1]);
+			int lv = 0;
 			nodes[idx].level = 0;
 			workQue.add(new int[]{idx, 0});
 
 			while(!workQue.isEmpty()){
 				int[] curr = workQue.poll();
-				for(Node nextNode : nodes[curr[0]].connection){
-					if(nextNode.level == -1 || nextNode.level > curr[1]+1){
-						nextNode.level = curr[1]+1;
-						workQue.add(new int[]{nextNode.number, curr[1]+1});
+				for(Integer newIdx : nodes[curr[0]].connection){
+					if(nodes[newIdx].level == -1 || nodes[newIdx].level > curr[1]+1){
+						nodes[newIdx].level = curr[1]+1;
+						workQue.add(new int[]{newIdx, curr[1]+1});
 					}
 				}
 			}
@@ -43,7 +47,7 @@ public class Solution {
 	class Node {
 		int number;
 		int level;
-		Set<Node> connection;
+		Set<Integer> connection;
 
 		public Node(int num){
 			this.number = num;
