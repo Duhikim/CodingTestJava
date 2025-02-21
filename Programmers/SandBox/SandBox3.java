@@ -2,15 +2,9 @@ package CodingTestStudy.SandBox;
 
 public class SandBox3 {
 
-public static void main(String[] args) {
-    ExClass ex = new ExClass();
-    ex.count++;
-    System.out.println(ex.count);
-    ex.count++;
-    System.out.println(ex.count);
-}
-}
-
-class ExClass {
-    int count = 0;
+    public static void main(String[] args) {
+        int a=3, b=4, c=5, d=6;
+        boolean B = (++a == --a);
+        System.out.println(B);
+    }
 }
