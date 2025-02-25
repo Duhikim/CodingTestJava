@@ -1,6 +1,6 @@
 package CodingTestStudy.PerfectCrime;
 
-public class Solution {
+public class Solution_ver1 {
 	public int solution(int[][] info, int n, int m) {
 		int[][] dp = new int [info.length+1][m];
 		for(int i=0; i<= info.length; i++){
@@ -34,7 +34,7 @@ public class Solution {
 	}
 
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		int[][] info = {{1, 2}, {2, 3}, {2, 1}};
 		int n = 4, m = 4;
 		sol.solution(info, n, m);
