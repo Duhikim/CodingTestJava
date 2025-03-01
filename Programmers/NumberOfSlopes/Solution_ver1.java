@@ -1,10 +1,14 @@
 package CodingTestStudy.NumberOfSlopes;
 
 // 시간 복잡도 : n * m * lenOfD * k = 8 * 8 * 100 * 10^9 >>>> k가 너무 커서 k처리는 따로해야할듯.
+// >> 한 사이클만 dp로 해결하고 그 이후로는 시작점을 추적하여 k-1사이클 반복하면 됨.
+
+// 결과 : 시간복잡도는 문제가 없으나 OOM (Out of memory) 발생.
+// 이를 해결하기 위해 HashMap을 전부 저장하는 방식을 수정하고 cycle 어레이도 10억개나 만드는 것은 불필요할 것으로 보임.
 
 import java.util.*;
 
-public class Solution {
+public class Solution_ver1 {
 	public int solution(int[][] grid, int[] d, int k) {
 		long mod = 1_000_000_007;
 		int n = grid.length;
@@ -77,7 +81,7 @@ public class Solution {
 	}
 
 	public static void main(String[] args) {
-		Solution sol = new Solution();
+		Solution_ver1 sol = new Solution_ver1();
 		int[][] grid =
 				{{0, 0, 0}, {1, 0, 0}, {0, 0, 0}, {0, 0, 1}, {1, 0, 0}};
 				//{{3, 6, 11, 12}, {4, 8, 15, 10}, {2, 7, 0, 16}};
