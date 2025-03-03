@@ -9,11 +9,13 @@ package CodingTestStudy.NumberOfSlopes;
 import java.util.*;
 
 public class Solution_ver3 {
+	int n, m, lenOfD;
+	long mod = 1_000_000_007;
 	public int solution(int[][] grid, int[] d, int k) {
-		long mod = 1_000_000_007;
-		int n = grid.length;
-		int m = grid[0].length;
-		int lenOfD = d.length;
+
+		n = grid.length;
+		m = grid[0].length;
+		lenOfD = d.length;
 		int logScale = log(2, k);
 
 
@@ -77,70 +79,44 @@ public class Solution_ver3 {
 
 		ArrayList<Integer> exponents = primeFactorization(k);
 		for(int exp : exponents){
-			int cycleIdx = 1;
-			if(exp==0 && exponents.size() > 1) exp = 1;
-
-			while (cycleIdx < exp) {
-				totalCount[2] = new long[n*m];
-				currCycleResults = new long[n * m][n * m + 1];
-				for (int e = 0; e < n * m; e++) {
-					if (prevCycleResults[e][n * m] == 0) continue;
-					for (int mid = 0; mid < n * m; mid++) {
-						if (prevCycleResults[mid][n*m] == 0 || prevCycleResults[e][mid] == 0) continue;
-						for(int s = 0; s< n*m; s++){
-							if(prevCycleResults[mid][s] == 0) continue;
-							currCycleResults[e][s] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
-							currCycleResults[e][s] %= mod;
-							currCycleResults[e][m*n] = 1;
-							totalCount[2][e] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
-							totalCount[2][e] %= mod;
-						}
-					}
-				}
-				prevCycleResults = currCycleResults;
-				totalCount[1] = totalCount[2];
-				cycleIdx++;
-			}
-
-
 		}
 
 		// totalCount[1]과 currCycleResults 만들어야함
-//		int cycleIdx = 1;
-//		while (cycleIdx < logScale) {
-//			totalCount[2] = new long[n*m];
-//			currCycleResults = new long[n * m][n * m + 1];
-//			for (int e = 0; e < n * m; e++) {
-//				if (prevCycleResults[e][n * m] == 0) continue;
-//				for (int mid = 0; mid < n * m; mid++) {
-//					if (prevCycleResults[mid][n*m] == 0 || prevCycleResults[e][mid] == 0) continue;
-//					for(int s = 0; s< n*m; s++){
-//						if(prevCycleResults[mid][s] == 0) continue;
-//						currCycleResults[e][s] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
-//						currCycleResults[e][s] %= mod;
-//						currCycleResults[e][m*n] = 1;
-//						totalCount[2][e] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
-//						totalCount[2][e] %= mod;
-//					}
-//				}
-//			}
-//			prevCycleResults = currCycleResults;
-//			totalCount[1] = totalCount[2];
-//			cycleIdx++;
-//		}
+		int cycleIdx = 1;
+		while (cycleIdx < logScale) {
+			totalCount[2] = new long[n*m];
+			currCycleResults = new long[n * m][n * m + 1];
+			for (int e = 0; e < n * m; e++) {
+				if (prevCycleResults[e][n * m] == 0) continue;
+				for (int mid = 0; mid < n * m; mid++) {
+					if (prevCycleResults[mid][n*m] == 0 || prevCycleResults[e][mid] == 0) continue;
+					for(int s = 0; s< n*m; s++){
+						if(prevCycleResults[mid][s] == 0) continue;
+						currCycleResults[e][s] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
+						currCycleResults[e][s] %= mod;
+						currCycleResults[e][m*n] = 1;
+						totalCount[2][e] += (prevCycleResults[mid][s]*prevCycleResults[e][mid])%mod;
+						totalCount[2][e] %= mod;
+					}
+				}
+			}
+			prevCycleResults = currCycleResults;
+			totalCount[1] = totalCount[2];
+			cycleIdx++;
+		}
 
-//		for(int rest = 0; rest<k-Math.pow(2, cycleIdx-1); rest++){
-//			totalCount[2] = new long[n*m];
-//
-//			for(int e=0; e<n*m; e++){
-//				if(prevCycleResults[e][m*n]==0) continue;
-//				for(int s=0; s<n*m; s++){
-//					totalCount[2][e] += (totalCount[1][s] * oneCycleResults[e][s])%mod;
-//					totalCount[2][e] %= mod;
-//				}
-//			}
-//			totalCount[1] = totalCount[2];
-//		}
+		for(int rest = 0; rest<k-Math.pow(2, cycleIdx-1); rest++){
+			totalCount[2] = new long[n*m];
+
+			for(int e=0; e<n*m; e++){
+				if(prevCycleResults[e][m*n]==0) continue;
+				for(int s=0; s<n*m; s++){
+					totalCount[2][e] += (totalCount[1][s] * oneCycleResults[e][s])%mod;
+					totalCount[2][e] %= mod;
+				}
+			}
+			totalCount[1] = totalCount[2];
+		}
 
 
 
@@ -185,6 +161,7 @@ public class Solution_ver3 {
 		result.sort(Comparator.reverseOrder());
 		return result;
 	}
+
 
 	public static void main(String[] args) {
 		Solution_ver3 sol = new Solution_ver3();
