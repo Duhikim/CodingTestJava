@@ -39,6 +39,8 @@ public class Solution {
 		ArrayDeque<int[]> stepDeque = new ArrayDeque<>();
 		stepDeque.add(new int[]{startR, startC});
 
+		int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1} }; // 상, 하, 좌, 우
+
 		while(!stepDeque.isEmpty()) {
 
 			step++;
@@ -49,63 +51,27 @@ public class Solution {
 
 				int[] curr = stepDeque.poll();
 
-				// UP
-				int newR = curr[0], newC = curr[1];
-				while (true) {
-					if (newR == 0 || board[newR - 1].charAt(newC) == 'D') {
-						if (steps[newR][newC] == -1) {
-							steps[newR][newC] = step;
-							stepDeque.add(new int[]{newR, newC});
-						}
-						break;
-					}
-					newR--;
-				}
+				for(int[] dir : directions){
+					int currR = curr[0];
+					int currC = curr[1];
 
-				// DOWN
-				newR = curr[0];
-				newC = curr[1];
-				while (true) {
-					if (newR == n - 1 || board[newR + 1].charAt(newC) == 'D') {
-						if (steps[newR][newC] == -1) {
-							steps[newR][newC] = step;
-							stepDeque.add(new int[]{newR, newC});
-						}
-						break;
-					}
-					newR++;
-				}
+					while (true) {
+						int newR = currR + dir[0];
+						int newC = currC + dir[1];
 
-				// LEFT
-				newR = curr[0];
-				newC = curr[1];
-				while (true) {
-					if (newC == 0 || board[newR].charAt(newC - 1) == 'D') {
-						if (steps[newR][newC] == -1) {
-							steps[newR][newC] = step;
-							stepDeque.add(new int[]{newR, newC});
-						}
-						break;
-					}
-					newC--;
-				}
+						if(newR < 0 || newR >= n || newC < 0 || newC >= m || board[newR].charAt(newC) == 'D') break;
 
-				// RIGHT
-				newR = curr[0];
-				newC = curr[1];
-				while (true) {
-					if (newC == m - 1 || board[newR].charAt(newC + 1) == 'D') {
-						if (steps[newR][newC] == -1) {
-							steps[newR][newC] = step;
-							stepDeque.add(new int[]{newR, newC});
-						}
-						break;
+						currR = newR;
+						currC = newC;
 					}
-					newC++;
+
+					if(steps[currR][currC] == -1){
+						steps[currR][currC] = step;
+						stepDeque.add(new int[]{currR, currC});
+					}
+					if (steps[endR][endC] != -1) return;
 				}
-				if (steps[endR][endC] != -1) return;
 			}
 		}
 	}
-
 }
