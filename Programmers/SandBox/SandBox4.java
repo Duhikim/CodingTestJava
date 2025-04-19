@@ -16,9 +16,13 @@ class Derivate extends Base{
 
 public class SandBox4 {
 	public static void main(String[] args) {
-		Base b = new Derivate();
+		Derivate b = new Derivate();
 		Derivate d = new Derivate();
-		System.out.println(b.getX()+b.x+d.getX()+d.x);
-	}
+		System.out.println("b.getX() :" + b.getX());
+		System.out.println("b.x :" + b.x);
+		System.out.println("d.getX() :" + d.getX());
+		System.out.println("d.x :" + d.x);
 
+
+	}
 }
