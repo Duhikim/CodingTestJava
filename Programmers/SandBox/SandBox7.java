@@ -9,7 +9,7 @@ class Parent_7 {
 		calculate();
 	}
 	public void calculate(){
-		total += total;
+		total += total*10;
 	}
 }
 
@@ -26,7 +26,6 @@ class Child_7 extends Parent_7{
 		total += total * 2;
 	}
 }
-
 
 public class SandBox7 {
 	public static void main(String[] args) {
