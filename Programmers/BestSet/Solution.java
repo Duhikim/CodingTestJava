@@ -1,7 +1,5 @@
 package CodingTestStudy.BestSet;
 
-import java.util.Arrays;
-
 public class Solution {
     public int[] solution(int n, int s) {
         if(n>s) return new int[]{-1};
