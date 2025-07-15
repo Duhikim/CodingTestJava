@@ -1,26 +1,48 @@
 package CodingTestStudy.TwoDimensionCoinFlip;
 
 public class Solution {
-
-    public static void main(String[] args) {
-        Solution sol = new Solution();
-        int[][] beginning =
-                {{0, 1, 0, 0, 0}, {1, 0, 1, 0, 1}, {0, 1, 1, 1, 0}, {1, 0, 1, 1, 0}, {0, 1, 0, 1, 0}};
-//                {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
-//                {{0,0,1,0,0},{1,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
-        int[][] target =
-                {{0, 0, 0, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 1, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}};
-//                {{1, 0, 1}, {0, 0, 0}, {0, 0, 0}};
-//                {{0,1,0,1,1},{0,0,0,0,0},{1,0,0,0,0},{1,0,0,0,0},{1,0,0,0,0}};
-
-        System.out.println(sol.solution(beginning, target));
-
-    }
-
     public int solution(int[][] beginning, int[][] target) {
-        boolean[][] discriminants = comparison(beginning, target);
+        boolean[][] matrix = comparison(beginning, target);
+        boolean[][] copyMat = copyMatrix(matrix);
 
-        return flip(discriminants);
+        // 먼저 되는지 안되는지 확인.
+        int discriminant = flipAll(copyMat);
+        if(discriminant == -1) return -1;
+
+        int answer = 0;
+
+        // 1열을 뒤집었을 때 이득인가?
+        int firstColBenefit = 0; // (뒤집었을 때의 이득이므로 뒤집는 비용 -1로 시작)
+        for(int i=1; i< matrix.length; i++){
+            if(!matrix[i][0]) firstColBenefit++; // false -> true가 되면 이득 +1
+            else firstColBenefit--; // true -> false가 되면 -1
+        }
+
+        // 1행을 뒤집었을 때 이득인가?
+        int firstRowBenefit = 0;
+        for(int j=1; j< matrix[0].length; j++){
+            if(!matrix[0][j]) firstRowBenefit++;
+            else firstRowBenefit--;
+        }
+
+        if(!matrix[0][0]){
+            //0, 0이 false면, 가로 세로 중 이득이 더 큰 쪽으로 뒤집으면 됨. 이득이 음수여도 뒤집어야 함.
+            if(firstColBenefit >= firstRowBenefit){
+                flipOneLine(matrix, -1, 0);
+            } else flipOneLine(matrix, 0, -1);
+            answer += 1 + flipAll(matrix);
+        }
+        else{
+            firstRowBenefit++; firstColBenefit++;
+            if(firstColBenefit + firstRowBenefit -2 <= 0) return discriminant;
+            else{
+                flipOneLine(matrix, -1, 0);
+                flipOneLine(matrix, 0, -1);
+                answer += 2 + flipAll(matrix);
+            }
+        }
+
+        return Math.min(answer, discriminant);
     }
 
     public boolean[][] comparison(int[][] mat1, int[][] mat2){
@@ -35,33 +57,26 @@ public class Solution {
         return result;
     }
 
-    public int flip (boolean[][] mat){
-        int row = mat.length;
-        int col = mat[0].length;
-        int answer = Integer.MAX_VALUE;
+    public int flipAll(boolean[][] mat){
+        int answer = 0;
 
-        for(int i=0; i<power(2,row); i++){
-            boolean[][] copyMat = copyMatrix(mat);
-            int counter = 0;
-            int exp = 0;
-
-            while(exp < row){
-                if((i & power(2,exp)) != 0) {
-                    flipOneLine(copyMat, exp, -1);
-                    counter++;
-                }
-                exp++;
+        // 1열에 false가 있으면 그 행을 뒤집는다.
+        for(int i=0; i<mat.length; i++){
+            if(!mat[i][0]) {
+                flipOneLine(mat, i, -1);
+                answer++;
             }
-
-            for (int c = 0; c < col; c++) {
-                if (!copyMat[0][c]) {
-                    flipOneLine(copyMat, -1, c);
-                    counter++;
-                }
-            }
-            if(counter<answer && allTrue(copyMat)) answer = counter;
         }
-        return (answer==Integer.MAX_VALUE)? -1: answer;
+        for(int j=0; j<mat[0].length; j++){
+            if(!mat[0][j]) {
+                flipOneLine(mat, -1, j);
+                answer++;
+            }
+        }
+        for(int i=0; i<mat.length; i++) for(int j=0; j<mat[0].length; j++){
+            if(!mat[i][j]) return -1;
+        }
+        return answer;
     }
 
     public void flipOneLine(boolean[][] mat, int row, int col){
@@ -79,28 +94,25 @@ public class Solution {
         else System.out.println("Not available");
     }
 
-    public boolean allTrue(boolean[][] mat){
-        for(boolean[] arr: mat){
-            for(boolean b: arr) if(!b) return false;
-        } return true;
+    boolean[][] copyMatrix(boolean[][] mat){
+        boolean[][] copyMat = new boolean[mat.length][mat[0].length];
+
+        for(int i=0; i< mat.length; i++)for(int j=0; j<mat[0].length; j++)
+            copyMat[i][j] = mat[i][j];
+        return copyMat;
     }
 
-    public boolean[][] copyMatrix(boolean[][] mat){
-        boolean[][] result = new boolean[mat.length][mat[0].length];
-        for(int i=0; i<mat.length; i++) for(int j=0; j<mat[0].length; j++){
-            result[i][j] = mat[i][j];
-        } return result;
-    }
+    public static void main(String[] args) {
+        Solution sol = new Solution();
 
-    public int power(int a, int b){
-        int result = 1;
-        int base = a;
-        while(b>0){
-            if((b&1) == 1)result *= base;
-            base *= base;
-            b >>= 1;
-        }
-        return result;
+        int[][] beginning =
+                {{0, 1, 0, 0, 0}, {1, 0, 1, 0, 1}, {0, 1, 1, 1, 0}, {1, 0, 1, 1, 0}, {0, 1, 0, 1, 0}};
+//                {{1, 0, 0, 0, 0}, {0, 1, 1, 1, 1}, {0, 1, 1, 1, 1}};
+        int[][] target =
+                {{0, 0, 0, 1, 1}, {0, 0, 0, 0, 1}, {0, 0, 1, 0, 1}, {0, 0, 0, 1, 0}, {0, 0, 0, 0, 1}};
+//                {{1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}, {1, 1, 1, 1, 1}};
+        sol.solution(beginning, target);
+
     }
 
 }
