@@ -12,14 +12,14 @@ public class Solution {
         int answer = 0;
 
         // 1열을 뒤집었을 때 이득인가?
-        int firstColBenefit = 0; // (뒤집었을 때의 이득이므로 뒤집는 비용 -1로 시작)
+        int firstColBenefit = -1; // (뒤집었을 때의 이득이므로 뒤집는 비용 -1로 시작)
         for(int i=1; i< matrix.length; i++){
             if(!matrix[i][0]) firstColBenefit++; // false -> true가 되면 이득 +1
             else firstColBenefit--; // true -> false가 되면 -1
         }
 
         // 1행을 뒤집었을 때 이득인가?
-        int firstRowBenefit = 0;
+        int firstRowBenefit = -1;
         for(int j=1; j< matrix[0].length; j++){
             if(!matrix[0][j]) firstRowBenefit++;
             else firstRowBenefit--;
@@ -34,7 +34,7 @@ public class Solution {
         }
         else{
             firstRowBenefit++; firstColBenefit++;
-            if(firstColBenefit + firstRowBenefit -2 <= 0) return discriminant;
+            if(firstColBenefit + firstRowBenefit <= 0) return discriminant;
             else{
                 flipOneLine(matrix, -1, 0);
                 flipOneLine(matrix, 0, -1);
