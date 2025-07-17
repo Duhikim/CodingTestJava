@@ -1,64 +1,95 @@
 package CodingTestStudy.SheepAndWolf;
 
-/*
-<풀이>
-규칙1. 현재 위치에서 바로 취할 수 있는 양이 있으면 무조건 취함.
-규칙2. 가장 끝단에 늑대가 위치하면 그냥 삭제해도 무관함. 어차피 안갈것.
-		그러면 끝단에는 반드시 양이 존재하게 된다.
-
-노드가 늑대인 경우, 그 노드에 가져올 수 있는 양-늑대의 최대 수를 저장.
-
-최우선순위 : 이 노드를 통과하기만 하면 늑대대비 양의 수로 이득을 볼 수 있는 노드. 최소 요구 양 수가 적을 수록 먼저 간다.
-2순위 : 이 노드를 통과하면 늑대대비 양의수는 +-0지만 어쨌든 양의 수는 늘어남. 최소 요구 양 수가 적을 수록 먼저 간다.
-3순위 : 이 노드를 통과하면 늑대대비 양의수는 마이너스로 손해지만, 양의 수는 늘어나기때문에 가장 마지막으로 방문하면 된다. 최소 요구 양 수가 적을 수록 반드시 먼저 가야하는 것은 아니다.
-
-2순위까지는 갈수있으면 무조건 가면 된다. 하지만 3순위만 남았으면 어디로 가든 늑대비양수비는 줄기때문에 순서를 잘 정해야 한다. 목적은 양의 절대 수를 가장 많이 늘리는 것.
-
- */
-
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Solution {
-	public class SheepPicker{
-		ArrayList<Node> nodes;
-		int sheep;
-		int wolves;
+    Node[] nodes;
+    int answer;
+    int sheep;
+    int wolves;
+    int totalSheep = 0;
+    boolean findAnswer = false;
 
-		public SheepPicker() {
-			this.nodes = new ArrayList<>();
-			this.sheep = 0;
-			this.wolves = 0;
-		}
+    class Node{
+        int id;
+        int kind; // 0 for sheep, 1 for wolf
+        List<Node> sons;
+        Node parent;
 
-		public void deleteGarbage(){
-			// 늑대 중 sons가 없는 것을 삭제한다.
-			// 삭제하면서 그 부모를 기억하고있는다.
-			// 부모의 sons에서 방금 삭제한 자식을 set에서 삭제한다.
-			// 부모가 늑대이고 sons가 없으면 이 함수를 다시 호출한다.
-			// 위와 같은 과정을 한번 거치면 끝에 늑대가 오는 쓰레기 값이 모두 없어진다.
-		}
+        public Node(int id, int kind){
+            this.id = id;
+            this.kind = kind;
+            sons = new ArrayList<>();
+        }
 
-		public void pickNode(Node node){
-			// node를 취한다.
-			// node의 자식 중 양이 있으면 그역시 자동으로 취하기 위해 이 함수를 다시 호출한다.
-			// 이 과정을 거치면 node 밑으로 오는 양들은 다 취하게 된다.
-		}
+    }
 
+    public int solution(int[] info, int[][] edges) {
+        nodes = new Node[info.length];
+        for(int i=0; i<info.length; i++){
+            nodes[i] = new Node(i, info[i]);
+            if(info[i]==0) totalSheep++;
+        }
+        for(int[] edge: edges){
+            int parent = edge[0];
+            int child = edge[1];
+            nodes[parent].sons.add(nodes[child]);
+            nodes[child].parent = nodes[parent];
+        }
 
-	}
-	public class Node{
-		Node parent;
-		ArrayList<Node> sons;
-		boolean wolf;
-		boolean visited;
+        // 늑대 말단부는 어차피 안가므로 미리 다 잘라서 연산을 줄임
+        for(Node node: nodes){
+            Node curr = node;
+            while(curr.kind==1 && curr.sons.isEmpty()){
+                node.parent.sons.remove(node);
+                curr = curr.parent;
+            }
+        }
 
-	}
-	public int solution(int[] info, int[][] edges) {
+        sheep = 1; wolves = 0;
+        search(nodes[0], nodes[0].sons);
 
+        return answer;
+    }
 
+    public void search(Node curr, List<Node> nextNodes){
 
-		int answer = 0;
-		return answer;
-	}
+        if(nextNodes.isEmpty() || sheep <= wolves){
+            System.out.println("더 이상 진행 불가");
+            if(nextNodes.isEmpty()) System.out.println("트리 끝까지 내려갔음.");
+            else System.out.println("양의 수 " + sheep + "마리, 늑대 수 " + wolves + " 마리");
+            if(sheep > answer) {
+                answer = sheep;
+                System.out.println("정답 갱신. 양 " + answer + " 마리");
+            }
+            if(answer==totalSheep){
+                System.out.println("최대값 " + answer + " 마리 도달");
+                findAnswer = true;
+            }
+            System.out.println(curr.id + " 노드 탈출.");
+            return;
+        }
+
+        for(int i=0; i<nextNodes.size(); i++){
+
+            Node nextNode = nextNodes.get(i);
+            nextNodes.addAll(nextNode.sons);
+            nextNodes.remove(i);
+            if(nextNode.kind==0) sheep++;
+            if(nextNode.kind==1) wolves++;
+            System.out.println(nextNode.id + "노드 진입, 직전 노드 : " + curr.id);
+
+            search(nextNode, nextNodes);
+            if(findAnswer) return;
+
+            if(nextNode.kind==0) sheep--;
+            if(nextNode.kind==1) wolves--;
+            nextNodes.add(i, nextNode);
+            nextNodes.removeAll(nextNode.sons);
+        }
+
+    }
+
 }
