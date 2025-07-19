@@ -10,8 +10,8 @@ public class Solution {
         // == brown/4 + 1 +- route( ((brown+4)^2) / 16 - (brown+yellow) )
         // 2.5+1 +- 0.5 == 4 or 3
 
-        double a = (double)brown/4 + 1 + Math.sqrt( ( ((double)brown+4) * ((double)brown +4)) /16 - (double)(brown+yellow));
-        double b = (double)brown/2 + 2 - a;
+        double a = brown/4.0 + 1 + 0.25 * Math.sqrt((brown-4)*(brown-4) - 16*yellow);
+        double b = brown/2.0 + 2 - a;
 
         return new int[]{(int)a, (int)b};
 
