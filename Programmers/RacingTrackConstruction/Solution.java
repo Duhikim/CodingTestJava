@@ -7,23 +7,26 @@ public class Solution {
     int[][] board;
     Node[][] nodes;
     int h, w;
-    int[][] direction = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    int[][] direction = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // 하, 상, 우, 좌
 
     class Node{
         int straight;
         int curve;
         int cost;
+        int dir; // 0 or 2. 가로로왔다면 0, 세로로왔다면 2
 
-        public Node(int straight, int curve){
+        public Node(int straight, int curve, int dir){
             this.straight = straight;
             this.curve = curve;
             this.cost = straight+5*curve;
+            this.dir = dir;
         }
-        public void update(int straight, int curve){
+        public void update(int straight, int curve, int dir){
             if(straight+5*curve < this.cost){
                 this.straight = straight;
                 this.curve = curve;
                 this.cost = straight+5*curve;
+                this.dir = dir;
             }
         }
     }
@@ -35,7 +38,7 @@ public class Solution {
 
         nodes = new Node[h][w];
         Queue<int[]> queue = new LinkedList<>();
-        nodes[0][0] = new Node(0, 0);
+        nodes[0][0] = new Node(0, 0, 0);
 
         for(int dir=0; dir<4; dir++){
             int len = 1;
@@ -43,7 +46,7 @@ public class Solution {
                 int newR = direction[dir][0] * len;
                 int newC = direction[dir][1] * len;
                 if (newR < 0 || newC < 0 || newR >= h || newC >= w || board[newR][newC] == 1) break;
-                nodes[newR][newC] = new Node(len, 0);
+                nodes[newR][newC] = new Node(len, 0, (dir<2)?2:0);
                 queue.add(new int[]{newR, newC});
                 len++;
             }
@@ -51,8 +54,9 @@ public class Solution {
 
         while(!queue.isEmpty()){
             int[] coord = queue.poll();
+            int priorDir = nodes[coord[0]][coord[1]].dir;
 
-            for(int dir=0; dir<4; dir++){
+            for(int dir=priorDir; dir<priorDir+2; dir++){
                 int len = 1;
                 while(true) {
                     int newR = coord[0] + direction[dir][0] * len;
@@ -63,10 +67,10 @@ public class Solution {
                     int newCurve = nodes[coord[0]][coord[1]].curve + 1;
                     int newCost = newStraight + 5 * newCurve;
                     if (nodes[newR][newC] == null) {
-                        nodes[newR][newC] = new Node(newStraight, newCurve);
+                        nodes[newR][newC] = new Node(newStraight, newCurve, (dir<2)?2:0);
                         queue.add(new int[]{newR, newC});
                     } else if (nodes[newR][newC].cost > newCost) {
-                        nodes[newR][newC].update(newStraight, newCurve);
+                        nodes[newR][newC].update(newStraight, newCurve, (dir<2)?2:0);
                         queue.add(new int[]{newR, newC});
                     }
                     len++;
