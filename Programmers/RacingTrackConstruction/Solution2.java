@@ -56,4 +56,12 @@ public class Solution2 {
         // 이론상 절대 도달하지 않음 (문제에서 보장됨)
         return -1;
     }
+
+    public static void main(String[] args) {
+        Solution2 sol = new Solution2();
+        int[][] board;
+
+        board = new int[][]{{0,0,0},{0,0,0},{0,0,0}};
+        System.out.println(sol.solution(board));
+    }
 }
