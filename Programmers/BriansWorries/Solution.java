@@ -37,6 +37,7 @@ public class Solution {
         for(int i=0; i<sentence.length(); i++){
             char letter = sentence.charAt(i);
             if(letter < 'A' || letter > 'Z') {
+                if(letter == ' ') return "invalid";
                 dq.add(letter);
                 map.put(letter, map.getOrDefault(letter, 0) + 1);
             }
@@ -54,10 +55,27 @@ public class Solution {
                 if(letter!=letter2) {
                     for(int i=1; i<map.get(letter2); i++){
                         if(dq.poll() != letter2) return "invalid";
-                    }
+                    } if(dq.poll() != letter) return "invalid";
                     rules.add(new char[]{letter2, '1'});// rule 1로 저장
+                    rules.add(new char[]{letter, '2'});// rule 2로 저장
                 }
-                rules.add(new char[]{letter, '2'});// rule 2로 저장
+                else{
+                    for(int i=0; i<sentence.length(); i++){
+                        if(sentence.charAt(i) != letter) continue;
+                        if(i+3 < sentence.length()
+                            && sentence.charAt(i+2) == letter
+                            && i-1 >= 0 && sentence.charAt(i-1) >= 'A' && sentence.charAt(i-1) <= 'Z'
+                            && sentence.charAt(i+3) >= 'A' && sentence.charAt(i+3) <= 'Z'){
+                            rules.add(new char[]{letter, '1'});
+                            break;
+                        }
+                        else{
+                            rules.add(new char[]{letter, '2'});
+                            break;
+                        }
+                    }
+                }
+
             }
         }
 
@@ -96,7 +114,13 @@ public class Solution {
                 answer.replace(start, start+1, " ").replace(end, end+1, " ");
             }
         }
-        return answer.toString().replaceAll("  ", " ").trim();
+        String answerstr = answer.toString();
+
+        while(answerstr.contains("  ")){
+            answerstr = answerstr.replaceAll("  ", " ");
+        }
+
+        return answerstr.trim();
     }
 
     public static void main(String[] args) {
@@ -104,12 +128,20 @@ public class Solution {
         Solution sol = new Solution();
 
         String[] input = {
-                "HaEaLaLaObWORLDb",
-                "SpIpGpOpNpGJqOqA",
-                "AxAxAxAoBoBoB"
+                "HaEaLaLaObWORLDb", // HELLO WORLD
+                "SpIpGpOpNpGJqOqA", // SIGONG JOA
+                "AxAxAxAoBoBoB", // invalid
+                "aHELLOa bWORLDb", // invalid
+                "aHbEbLbLbOacWdOdRdLdDc", // HELLO WORLD
+                "HaEaLaLObWORLDb", // HELL O WORLD
+                "aHELLOWORLDa", // HELLOWORLD
+                "HaEaLaLaOWaOaRaLaD", // invalid
+                "abHELLObaWORLD", // invalid
+                "AAAaBaAbBBBBbCcBdBdBdBcCeBfBeGgGGjGjGRvRvRvRvRvR",
+                "AaAaAcA" // A A AA
         };
-        int tc = 2;
-
+        int tc = 10;
+        System.out.println("input : " + input[tc]);
         System.out.println(sol.solution(input[tc]));
 
     }
