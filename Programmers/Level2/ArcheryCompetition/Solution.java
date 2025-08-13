@@ -1,4 +1,4 @@
-package CodingTestStudy.ArcheryCompetition;
+package CodingTestStudy.Level2.ArcheryCompetition;
 
 class Solution {
 	int myArrows;
@@ -95,7 +95,7 @@ class Solution {
 }
 
 
-//package CodingTestStudy.ArcheryCompetition;
+//package CodingTestStudy.Level2.ArcheryCompetition;
 //// 어떤 점수에서 지거나 비길거면 한발도 안맞춘다.
 //// 이기려면 어피치보다 딱 한개 많이 쏴야 한다.
 //// 이기기 위한 화살 한방당 가중치를 계산해서 가중치가 높은 것을 취할것.
