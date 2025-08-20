@@ -44,8 +44,8 @@ public class Solution {
         }
     }
 
-    Map<Integer, List<Order>> menuOrders = new HashMap<>(); // Key : 메뉴, Value :
-    Map<Integer, List<int[]>> menuPrefix = new HashMap<>();
+    Map<Integer, List<Order>> menuOrders = new HashMap<>(); // Key : 메뉴, Value : 그 메뉴를 시킨 주문내역 리스트
+    Map<Integer, List<int[]>> menuPrefix = new HashMap<>(); // Key : 메뉴, Value :
 
     List<Order> globalOrders = new ArrayList<>();
     List<int[]> globalPrefix;
