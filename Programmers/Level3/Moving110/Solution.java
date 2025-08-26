@@ -1,4 +1,4 @@
-package CodingTestStudy.Moving110;
+package CodingTestStudy.Level3.Moving110;
 
 class Solution {
     public String[] solution(String[] s) {
